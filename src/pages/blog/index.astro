@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import SEO from '../../components/SEO.astro';
+import '../../styles/global.css';
+
+// Get all blog posts, sorted by date
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <SEO
+    title="Blog | Neurohackingly"
+    description="Articles on productivity, AI, neuroscience, and personal growth"
+  />
+</head>
+<body>
+  <nav>
+    <a href="/">← Home</a>
+    <a href="/blog" class="active">Blog</a>
+    <a href="/newsletter">Newsletter</a>
+  </nav>
+
+  <main>
+    <header>
+      <h1>Blog</h1>
+      <p>Exploring productivity, AI, neuroscience, and personal growth</p>
+    </header>
+
+    <div class="posts-grid">
+      {sortedPosts.map((post) => (
+        <article class="post-card">
+          {post.data.image && (
+            <img src={post.data.image.url} alt={post.data.image.alt} />
+          )}
+          <div class="post-content">
+            <h2>
+              <a href={`/blog/${post.id}`}>{post.data.title}</a>
+            </h2>
+            <p>{post.data.description}</p>
+            <div class="meta">
+              <time datetime={post.data.pubDate.toISOString()}>
+                {post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+              </time>
+              {post.data.tags.length > 0 && (
+                <>
+                  <span>·</span>
+                  <div class="tags">
+                    {post.data.tags.slice(0, 3).map(tag => (
+                      <span class="tag">#{tag}</span>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2024 Neurohackingly by Lukas Zangerl</p>
+  </footer>
+</body>
+</html>

@@ -1,16 +1,73 @@
 ---
+import { getCollection } from 'astro:content';
+import SEO from '../components/SEO.astro';
+import '../styles/global.css';
 
+const posts = await getCollection('blog', ({ data }) => !data.draft && data.featured);
+const recentPosts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 6);
 ---
 
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+<head>
+  <SEO
+    title="Neurohackingly - Productivity, AI & Neuroscience"
+    description="Practical strategies and insights on productivity, AI, neuroscience, and personal growth by Lukas Zangerl"
+  />
+</head>
+<body>
+  <nav>
+    <a href="/" class="active">Home</a>
+    <a href="/blog">Blog</a>
+    <a href="/newsletter">Newsletter</a>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <h1>Neurohackingly</h1>
+      <p class="tagline">Upgrade your brain, mind, and body</p>
+      <p class="subtitle">Practical strategies for productivity, AI, and personal growth</p>
+      <a href="/blog" class="cta">Read the Blog →</a>
+    </header>
+
+    <section class="recent-posts">
+      <h2>Recent Articles</h2>
+      <div class="posts-grid">
+        {recentPosts.map((post) => (
+          <article class="post-card">
+            {post.data.image && (
+              <img src={post.data.image.url} alt={post.data.image.alt} />
+            )}
+            <div class="post-content">
+              <h3>
+                <a href={`/blog/${post.id}`}>{post.data.title}</a>
+              </h3>
+              <p>{post.data.description}</p>
+              <time datetime={post.data.pubDate.toISOString()}>
+                {post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+              </time>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="newsletter-cta">
+      <h2>Join the Newsletter</h2>
+      <p>Get actionable productivity tips and insights delivered weekly</p>
+      <a href="/newsletter" class="cta">Subscribe Now →</a>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2024 Neurohackingly by Lukas Zangerl</p>
+    <div class="social">
+      <a href="https://x.com/neurohackingly" target="_blank">X</a>
+      <a href="https://linkedin.com/in/lukzan" target="_blank">LinkedIn</a>
+      <a href="https://github.com/codeme-ne" target="_blank">GitHub</a>
+    </div>
+  </footer>
+</body>
 </html>

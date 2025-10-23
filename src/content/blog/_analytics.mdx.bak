@@ -1,0 +1,35 @@
+---
+title: Analytics
+description: Analytics
+pubDate: 2025-06-14T02:02:54.000Z
+author: Lukas Zangerl
+tags: []
+featured: false
+draft: true
+updatedDate: 2025-06-23T09:57:51.000Z
+---
+* * *
+
+### 📧 Newsletter Commitment
+
+\-
+
+Sent
+
+29
+
+Goal
+
+\-%
+
+Rate
+
+Loading...
+
+Next deadline: Sunday 20:00
+
+\--:--:--
+
+// Config with your API const API = '020164d2dc6aeb8f6c566637a4'; const URL = 'https://neurohackingly.ghost.io'; const START = new Date('2025-06-15'); const END = new Date('2025-12-31'); // Messages const M = \[ \[0, "🚀 Start your journey. Every newsletter shapes a mind."\], \[1, "⚡ First one done! The hardest step is behind you."\], \[5, "🔥 Habit forming. Your consistency is building momentum."\], \[10, "💎 10 weeks! You're in the top 10% of creators."\], \[15, "🧠 Halfway there. Your voice is becoming essential."\], \[20, "⭐ Elite level. Few maintain this consistency."\], \[25, "👑 Final stretch. Legends are made here."\], \[29, "🏆 COMPLETE! 29 weeks of pure dedication."\] \]; // Get next Sunday 20:00 function getNextSunday20() { const now = new Date(); const daysUntilSunday = (7 - now.getDay()) % 7; const nextSunday = new Date(now); // If it's Sunday but before 20:00, use today if (daysUntilSunday === 0 && now.getHours() < 20) { nextSunday.setHours(20, 0, 0, 0); } else { // Otherwise go to next Sunday nextSunday.setDate(now.getDate() + (daysUntilSunday || 7)); nextSunday.setHours(20, 0, 0, 0); } return nextSunday; } // Update timer function updateTimer() { const now = new Date(); const target = getNextSunday20(); const diff = target - now; if (diff <= 0) { document.getElementById('timer').textContent = 'TIME TO PUBLISH!'; document.getElementById('urgency').textContent = '🔴 Newsletter time!'; return; } const hours = Math.floor(diff / (1000 \* 60 \* 60)); const minutes = Math.floor((diff % (1000 \* 60 \* 60)) / (1000 \* 60)); const seconds = Math.floor((diff % (1000 \* 60)) / 1000); document.getElementById('timer').textContent = \`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}\`; // Urgency messages const urgencyEl = document.getElementById('urgency'); if (hours < 2) { urgencyEl.textContent = '⚡ Less than 2 hours!'; urgencyEl.style.color = '#ff6b6b'; } else if (hours < 12) { urgencyEl.textContent = '📝 Newsletter day - prepare!'; urgencyEl.style.color = '#ffd43b'; } else if (hours < 48) { urgencyEl.textContent = '⏰ Tomorrow is the day'; urgencyEl.style.color = '#00ccff'; } else { urgencyEl.textContent = \`${Math.floor(hours / 24)} days remaining\`; } } // Load data async function loadData() { try { const r = await fetch(\`${URL}/ghost/api/content/posts/?key=${API}&filter=tag:newsletter&limit=all&fields=id,published\_at\`); if (!r.ok) throw new Error('API Error'); const data = await r.json(); const posts = (data.posts || \[\]).filter(p => { const d = new Date(p.published\_at); return d >= START && d <= END; }); // Calculate const sent = posts.length; const weeks = Math.ceil((new Date() - START) / (7\*24\*60\*60\*1000)); const rate = weeks > 0 ? Math.round((sent/Math.min(weeks, 29))\*100) : 0; const prog = Math.round((sent/29)\*100); // Update DOM document.getElementById('sent').textContent = sent; document.getElementById('rate').textContent = rate + '%'; document.getElementById('rate').style.color = rate >= 90 ? '#00ff88' : rate >= 70 ? '#00ccff' : '#ff6b6b'; document.getElementById('bar').style.width = prog + '%'; // Message let msg = M\[0\]\[1\]; for (let i = M.length - 1; i >= 0; i--) { if (sent >= M\[i\]\[0\]) { msg = M\[i\]\[1\]; break; } } document.getElementById('msg').innerHTML = msg; } catch (e) { document.getElementById('msg').innerHTML = '⚠️ Unable to load data'; } } // Initialize loadData(); updateTimer(); // Update timer every second setInterval(updateTimer, 1000);
+
+* * *

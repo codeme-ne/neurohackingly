@@ -1,0 +1,70 @@
+---
+import SEO from '../components/SEO.astro';
+import '../styles/global.css';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <SEO
+    title="Newsletter | Neurohackingly"
+    description="Join the Neurohackingly newsletter for weekly insights on productivity, AI, and neuroscience"
+  />
+</head>
+<body>
+  <nav>
+    <a href="/">← Home</a>
+    <a href="/blog">Blog</a>
+    <a href="/newsletter" class="active">Newsletter</a>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <h1>Sunday Shares</h1>
+      <p class="tagline">Your Weekly Dose of Actionable Insights</p>
+      <p class="subtitle">
+        Every Sunday, get practical productivity tips, AI insights, and neuroscience-backed strategies
+        delivered straight to your inbox.
+      </p>
+    </header>
+
+    <section style="max-width: 500px; margin: 3rem auto; text-align: center;">
+      <p style="margin-bottom: 2rem; color: #666;">
+        Join a growing community of readers who are upgrading their brain, mind, and body.
+      </p>
+
+      <!-- Placeholder for newsletter form -->
+      <div style="padding: 2rem; background: #f9f9f9; border-radius: 0.5rem;">
+        <h3>Subscribe Now</h3>
+        <p style="font-size: 0.9rem; color: #666; margin: 1rem 0;">
+          Newsletter integration coming soon. Add your email service (ConvertKit, Mailchimp, etc.)
+        </p>
+
+        <!-- Example form structure -->
+        <form style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+          <input
+            type="email"
+            placeholder="your@email.com"
+            required
+            style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 0.25rem; font-size: 1rem;"
+          />
+          <button
+            type="submit"
+            style="padding: 0.75rem; background: #0066cc; color: white; border: none; border-radius: 0.25rem; font-weight: 600; cursor: pointer;"
+          >
+            Subscribe
+          </button>
+        </form>
+      </div>
+
+      <p style="margin-top: 2rem; font-size: 0.9rem; color: #666;">
+        No spam. Unsubscribe anytime. Read by 100+ productivity enthusiasts.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2024 Neurohackingly by Lukas Zangerl</p>
+  </footer>
+</body>
+</html>

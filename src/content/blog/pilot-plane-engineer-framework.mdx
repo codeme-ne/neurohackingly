@@ -1,0 +1,148 @@
+---
+title: The Pilot-Plane-Engineer Framework
+description: The Pilot-Plane-Engineer Framework
+pubDate: 2025-07-15T19:35:43.000Z
+author: Lukas Zangerl
+tags:
+  - hash-newsletter
+  - newsletter
+featured: false
+draft: false
+updatedDate: 2025-09-11T17:43:13.000Z
+---
+Last week, I presented at the [Landsiedel NLP Conference](https://www.landsiedel-seminare.de/nlp/nlp-kongress/nlp-kongress-zeilitzheim-2025.html#:~:text=Meistere%20KI%20als%20Coach%2C%20bevor%20KI%20dich%20meistert!%0AK%C3%BCnstliche,Ziel%3A%20weniger%20Ablenkung%2C%20mehr%20Fokus%20und%20eine%20Energie%2C%20die%20bleibt.) in Zeilitzheim about productivity and AI.
+
+![](/content/images/2025/07/3.png)
+
+![](/content/images/2025/07/2.png)
+
+I shared how I'm using AI tools to build practical productivity solutions, starting with Ali Abdaal's Pilot-Airplane-Engineer framework.
+
+## **The Pilot, the Plane, and the Engineer**
+
+Ali Abdaal's framework divides productivity into three essential roles:
+
+👨‍✈️ **The Pilot (10%)** sets your direction. He is responsible for creating a long-term vision, defining goals, and monitoring progress. Think weekly planning sessions, daily manifestos, and quarterly reviews.
+
+✈️ **The Airplane (80%)** does the actual work. This role has three phases:
+
+*   **Takeoff**: The hardest part requiring the most energy
+*   **Cruise**: Maintaining focus, avoiding distractions, adjusting course as needed
+*   **Landing**: Recording accomplishments and preparing the next concrete steps
+
+🛠️ **The Engineer (10%)** optimizes your systems. He maintains tools, refines processes, and ensures everything runs smoothly.
+
+My key insight? Most of us spend too much time planning (Pilot) or tweaking systems (Engineer) and not enough time executing (Airplane).
+
+## The Productivity Framework inspired me to program a self-assessment quiz
+
+Using Claude Code I built an interactive assessment tool.
+
+0:00
+
+/0:45
+
+ 1× 
+
+After answering 15 questions, you'll receive the following 3 metrics:
+
+*   Your current percentage distribution across the three roles
+*   How well you perform in each role (scored 0-100%)
+*   The ability to download everything as a PDF and as an image
+
+## Here's a template to create your own quiz with AI
+
+### Step 1: Create Your Quiz Foundation
+
+```Prompt 1
+Build a complete quiz website in one HTML file:
+- Welcome page with "Start Quiz" button
+- 10 questions shown one at a time
+- 4 answer choices per question (A, B, C, D buttons)
+- Progress bar showing "Question X of 10"
+- Results page showing score and custom message
+- "Download Results" button that saves an image
+- "Try Again" button to restart
+- Modern design with smooth animations
+- Works perfectly on phones and computers
+Use a friendly blue color scheme. Make it look professional like Typeform.
+```
+
+### Step 2: Insert Your Quiz Content
+
+```Prompt 2
+Now add my quiz content. Replace everything with:
+
+QUIZ TITLE: [Your title here]
+DESCRIPTION: [One sentence describing your quiz]
+
+QUESTIONS:
+1. [Your first question here]
+   A) [First answer option]
+   B) [Second answer option]
+   C) [Third answer option]
+   D) [Fourth answer option]
+   CORRECT: [Letter of correct answer]
+
+[Copy this format for all 10 questions]
+
+RESULTS MESSAGES:
+- Score 90-100%: "[Your message for top scorers]"
+- Score 70-89%: "[Your message for good scores]"
+- Score 50-69%: "[Your message for average scores]"
+- Score 0-49%: "[Your message for low scores]"
+```
+
+### Step 3: Personalize Your Quiz
+
+```Prompt 3
+Now customize it:
+1. Change the main color from blue to [your favorite color]
+2. Add your logo/name at the top: "[Your name/brand]"
+3. Include social sharing: "Share your score on Twitter/Facebook"
+4. Add a PDF download with detailed results
+5. Make sure everything works smoothly
+6. Save the final version as my-quiz.html
+
+Test it once more and confirm it's ready to use!
+```
+
+* * *
+
+If you want to try my quiz, you can do so at this link: [produktiv.me/tuv](https://www.produktiv.me/tuv/) (unfortunately only in German)
+
+## **What This Means for You**
+
+AI tools like Claude Code and Cursor have democratized app development. You don't need years of coding experience to build useful tools.
+
+I'm already working on my next project: an app that generates personalized audio hypnosis sessions. Input your preferences (voice type, duration, goal), and it creates a custom auditory hypnosis - like a 5-minute sleep meditation with a soothing female voice.
+
+These tools aren't perfect - my Productivity Workshop site is still a prototype. But they're solid enough to provide real value and test ideas quickly.
+
+0:00
+
+/1:13
+
+ 1× 
+
+## **Your Turn**
+
+What productivity challenge could you solve with a custom tool? 😄
+
+If you found this helpful, click the thumbs up below. I'd love to share more about building practical AI solutions.
+
+Have a great week!  
+xx Lukas
+
+* * *
+
+## Other helpful Resources
+
+*   [Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices) - Tips and tricks for using Claude Code effectively
+*   [Short guide on Vibecoding](https://github.com/EnzeD/vibe-coding?tab=readme-ov-file) - Using Gemini 2.5 Pro Thinking and Cursor with Claude Sonnet 4 Thinking
+*   Create beautiful design: [https://aura.build/](https://aura.build/)
+*   Boilerplate Tool: [https://mcpboilerplate.com/](https://mcpboilerplate.com/)
+*   Icons: [https://lucide.dev/](https://lucide.dev/)
+*   Vibe-Coding-Guide: [https://dev.to/wasp/a-structured-workflow-for-vibe-coding-full-stack-apps-352l](https://dev.to/wasp/a-structured-workflow-for-vibe-coding-full-stack-apps-352l)
+
+![](/content/images/2025/09/www-neurohackingly-com-pilot-plane-engineer-framework--image-1.png)

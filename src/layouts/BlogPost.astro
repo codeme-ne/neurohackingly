@@ -1,0 +1,103 @@
+---
+import SEO from '../components/SEO.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  author: string;
+  image?: { url: string; alt: string };
+  tags?: string[];
+}
+
+const { title, description, pubDate, updatedDate, author, image, tags = [] } = Astro.props;
+
+// Reading time calculation (simple: ~200 words/min)
+const content = await Astro.slots.render('default');
+const wordCount = content.split(/\s+/).length;
+const readingTime = Math.ceil(wordCount / 200);
+
+// Schema.org structured data
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description: description,
+  image: image?.url,
+  datePublished: pubDate.toISOString(),
+  dateModified: (updatedDate || pubDate).toISOString(),
+  author: {
+    '@type': 'Person',
+    name: author,
+    url: 'https://neurohackingly.com/about'
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Neurohackingly',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://neurohackingly.com/logo.png'
+    }
+  }
+};
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <SEO
+    title={`${title} | Neurohackingly`}
+    description={description}
+    image={image?.url}
+    article={true}
+    publishedTime={pubDate}
+    modifiedTime={updatedDate}
+    tags={tags}
+  />
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+</head>
+<body>
+  <nav>
+    <a href="/">← Home</a>
+    <a href="/blog">Blog</a>
+    <a href="/newsletter">Newsletter</a>
+  </nav>
+
+  <main>
+    <article>
+      <header>
+        {image && (
+          <img src={image.url} alt={image.alt} class="feature-image" />
+        )}
+        <h1>{title}</h1>
+        <div class="meta">
+          <time datetime={pubDate.toISOString()}>
+            {pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </time>
+          <span>·</span>
+          <span>{readingTime} min read</span>
+          <span>·</span>
+          <span>{author}</span>
+        </div>
+        {tags.length > 0 && (
+          <div class="tags">
+            {tags.map(tag => (
+              <a href={`/blog/tag/${tag}`} class="tag">#{tag}</a>
+            ))}
+          </div>
+        )}
+      </header>
+
+      <div class="content">
+        <slot />
+      </div>
+    </article>
+
+    <footer>
+      <p>© 2024 Neurohackingly by Lukas Zangerl</p>
+    </footer>
+  </main>
+</body>
+</html>
