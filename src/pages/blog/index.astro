@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import SEO from '../../components/SEO.astro';
 import '../../styles/global.css';
 
@@ -32,8 +33,18 @@ const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDa
     <div class="posts-grid">
       {sortedPosts.map((post) => (
         <article class="post-card">
-          {post.data.image && (
-            <img src={post.data.image.url} alt={post.data.image.alt} />
+          {post.data.hero ? (
+            <Image
+              src={post.data.hero}
+              alt={post.data.image?.alt ?? ''}
+              widths={[480, 768]}
+              sizes="(max-width: 720px) 100vw, 360px"
+              formats={['avif', 'webp', 'jpeg']}
+              loading="lazy"
+              decoding="async"
+            />
+          ) : post.data.image && (
+            <img src={post.data.image.url} alt={post.data.image.alt} loading="lazy" decoding="async" />
           )}
           <div class="post-content">
             <h2>

@@ -1,0 +1,112 @@
+---
+/**
+ * Generic Video Component
+ *
+ * Flexible video player with multiple source formats, poster, and optional lazy loading.
+ * Supports MP4, WebM, and other video formats.
+ *
+ * Props:
+ *   - sources: Array<{src: string, type: string}> - Video sources (e.g., [{src: 'video.webm', type: 'video/webm'}, ...])
+ *   - poster?: string - Poster image URL
+ *   - alt: string (required) - Descriptive text for accessibility
+ *   - width?: number - Explicit width (prevents CLS)
+ *   - height?: number - Explicit height (prevents CLS)
+ *   - controls?: boolean (default: true) - Show player controls
+ *   - autoplay?: boolean (default: false) - Auto-play on load
+ *   - loop?: boolean (default: false) - Loop playback
+ *   - muted?: boolean (default: false) - Mute audio
+ *   - playsinline?: boolean (default: true) - Play inline on mobile
+ *   - preload?: 'none' | 'metadata' | 'auto' (default: 'metadata')
+ *
+ * Example:
+ *   <Video
+ *     sources={[
+ *       { src: '/videos/demo.webm', type: 'video/webm' },
+ *       { src: '/videos/demo.mp4', type: 'video/mp4' }
+ *     ]}
+ *     poster="/videos/demo-poster.jpg"
+ *     alt="Demo video"
+ *     controls
+ *   />
+ */
+
+export interface VideoSource {
+  src: string;
+  type: string;
+}
+
+export interface Props {
+  sources: VideoSource[];
+  poster?: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  controls?: boolean;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  playsinline?: boolean;
+  preload?: 'none' | 'metadata' | 'auto';
+}
+
+const {
+  sources,
+  poster,
+  alt,
+  width,
+  height,
+  controls = true,
+  autoplay = false,
+  loop = false,
+  muted = false,
+  playsinline = true,
+  preload = 'metadata',
+} = Astro.props;
+---
+
+<video
+  controls={controls}
+  autoplay={autoplay}
+  loop={loop}
+  muted={muted}
+  playsinline={playsinline}
+  preload={preload}
+  poster={poster}
+  width={width}
+  height={height}
+  aria-label={alt}
+  class="video-player"
+>
+  {sources.map((source) => (
+    <source src={source.src} type={source.type} />
+  ))}
+
+  <!-- Fallback for browsers without video support -->
+  {poster && (
+    <img
+      src={poster}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      width={width}
+      height={height}
+    />
+  )}
+
+  <!-- Text fallback -->
+  <p>
+    Your browser doesn't support HTML5 video.
+    {sources.length > 0 && (
+      <a href={sources[0].src}>Download the video</a>
+    )}
+  </p>
+</video>
+
+<style>
+  .video-player {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+</style>

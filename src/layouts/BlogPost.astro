@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import SEO from '../components/SEO.astro';
 import '../styles/global.css';
 
@@ -9,10 +10,11 @@ interface Props {
   updatedDate?: Date;
   author: string;
   image?: { url: string; alt: string };
+  hero?: ImageMetadata;
   tags?: string[];
 }
 
-const { title, description, pubDate, updatedDate, author, image, tags = [] } = Astro.props;
+const { title, description, pubDate, updatedDate, author, image, hero, tags = [] } = Astro.props;
 
 // Reading time calculation (simple: ~200 words/min)
 const content = await Astro.slots.render('default');
@@ -68,8 +70,19 @@ const schema = {
   <main>
     <article>
       <header>
-        {image && (
-          <img src={image.url} alt={image.alt} class="feature-image" />
+        {hero ? (
+          <Image
+            src={hero}
+            alt={image?.alt ?? ''}
+            widths={[720, 1024, 1440]}
+            sizes="(max-width: 720px) 100vw, 720px"
+            formats={['avif', 'webp', 'jpeg']}
+            class="feature-image"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : image && (
+          <img src={image.url} alt={image.alt} class="feature-image" loading="lazy" decoding="async" />
         )}
         <h1>{title}</h1>
         <div class="meta">

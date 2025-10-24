@@ -2,7 +2,7 @@ import { defineCollection, z } from 'astro:content';
 
 const blog = defineCollection({
   type: 'content',
-  schema: z.object({
+  schema: ({ image }) => z.object({
     title: z.string(),
     description: z.string(),
     pubDate: z.coerce.date(),
@@ -12,6 +12,7 @@ const blog = defineCollection({
       url: z.string(),
       alt: z.string().default('')
     }).optional(),
+    hero: image().optional(), // Astro 5 optimized image (AVIF/WebP/responsive)
     tags: z.array(z.string()).default([]),
     featured: z.boolean().default(false),
     draft: z.boolean().default(false)
@@ -20,7 +21,7 @@ const blog = defineCollection({
 
 const de = defineCollection({
   type: 'content',
-  schema: z.object({
+  schema: ({ image }) => z.object({
     title: z.string(),
     description: z.string(),
     pubDate: z.coerce.date(),
@@ -30,6 +31,7 @@ const de = defineCollection({
       url: z.string(),
       alt: z.string().default('')
     }).optional(),
+    hero: image().optional(), // Astro 5 optimized image (AVIF/WebP/responsive)
     tags: z.array(z.string()).default([]),
     featured: z.boolean().default(false),
     draft: z.boolean().default(false)
