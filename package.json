@@ -7,7 +7,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "parse-ghost": "tsx scripts/ghost-parser.ts"
+    "parse-ghost": "tsx scripts/ghost-parser.ts",
+    "migrate-images": "tsx scripts/migrate-images.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.7",
