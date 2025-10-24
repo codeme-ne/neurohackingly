@@ -1,0 +1,27 @@
+<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Brain/Neural Network Icon Only -->
+  <g id="brain-icon">
+    <!-- Central node -->
+    <circle cx="30" cy="30" r="5" fill="#2563EB"/>
+    <!-- Neural connections -->
+    <path d="M17 12 L30 25" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M43 12 L30 25" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M10 30 L25 30" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M50 30 L35 30" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M17 48 L30 35" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M43 48 L30 35" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Outer nodes -->
+    <circle cx="17" cy="12" r="4" fill="#2563EB"/>
+    <circle cx="43" cy="12" r="4" fill="#2563EB"/>
+    <circle cx="10" cy="30" r="4" fill="#2563EB"/>
+    <circle cx="50" cy="30" r="4" fill="#2563EB"/>
+    <circle cx="17" cy="48" r="4" fill="#2563EB"/>
+    <circle cx="43" cy="48" r="4" fill="#2563EB"/>
+    <!-- Tech element - circuit lines -->
+    <path d="M8 18 L8 12 L14 12" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+    <path d="M52 42 L52 48 L46 48" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+    <!-- Additional circuit nodes -->
+    <circle cx="8" cy="18" r="1.5" fill="#10B981"/>
+    <circle cx="52" cy="42" r="1.5" fill="#10B981"/>
+  </g>
+</svg>
