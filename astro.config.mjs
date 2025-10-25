@@ -7,7 +7,7 @@ import mdx from '@astrojs/mdx';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://neurohackingly.com',
-  output: 'server',
+  output: 'static',
   adapter: vercel({
     webAnalytics: {
       enabled: true

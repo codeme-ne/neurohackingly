@@ -49,7 +49,6 @@ export const POST: APIRoute = async ({ request }) => {
       cur.count += 1;
       store.set(ip, cur);
       if (cur.count > maxHits) {
-        console.warn('Rate limit hit for IP', ip);
         return respond('error');
       }
     }
@@ -65,20 +64,15 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     if ((!FORM_ID && !TAG_ID) || (!API_SECRET && !API_KEY)) {
-      console.error('Missing ConvertKit env vars (FORM_ID/TAG_ID and API_SECRET or API_KEY).');
-      return respond('error', { code: 500, error: 'Missing ConvertKit env vars (FORM_ID/TAG_ID and API_SECRET or API_KEY).' });
+      return respond('error', { code: 500, error: 'Service configuration error' });
     }
 
-    // Validate Form ID is numeric (common mistake: using data-uid instead of data-sv-form)
+    // Validate Form ID is numeric
     if (FORM_ID && !/^\d+$/.test(FORM_ID)) {
-      const msg = `Form ID must be numeric (found: ${FORM_ID}). Check data-sv-form in your Kit embed.`;
-      console.error(msg);
-      return respond('error', { code: 500, error: msg });
+      return respond('error', { code: 500, error: 'Service configuration error' });
     }
     if (TAG_ID && !/^\d+$/.test(TAG_ID)) {
-      const msg = `Tag ID must be numeric (found: ${TAG_ID}).`;
-      console.error(msg);
-      return respond('error', { code: 500, error: msg });
+      return respond('error', { code: 500, error: 'Service configuration error' });
     }
 
     const url = FORM_ID
@@ -108,18 +102,8 @@ export const POST: APIRoute = async ({ request }) => {
       return respond('already');
     }
 
-    let errorText = '';
-    try {
-      const maybeJson = await response.clone().json();
-      errorText = (maybeJson && (maybeJson.message || maybeJson.error || JSON.stringify(maybeJson))) || '';
-    } catch {}
-    if (!errorText) {
-      try { errorText = await response.text(); } catch {}
-    }
-    console.error('ConvertKit subscribe error', response.status, errorText);
-    return respond('error', { code: response.status, error: errorText || 'Request to ConvertKit failed' });
+    return respond('error', { code: response.status, error: 'Subscription request failed' });
   } catch (error) {
-    console.error('Subscribe endpoint threw', error);
     return new Response(JSON.stringify({ status: 'error', error: 'Server error' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json; charset=utf-8' }

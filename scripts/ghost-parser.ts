@@ -63,9 +63,28 @@ turndownService.addRule('fencedCodeBlock', {
 
 async function parseGhostExport(jsonPath: string) {
   console.log('📖 Reading Ghost export...');
-  const ghostData: GhostExport = JSON.parse(
-    await fs.readFile(jsonPath, 'utf-8')
-  );
+
+  let ghostData: GhostExport;
+  try {
+    const rawData = await fs.readFile(jsonPath, 'utf-8');
+    ghostData = JSON.parse(rawData);
+
+    // Validate structure
+    if (!ghostData.db || !Array.isArray(ghostData.db) || ghostData.db.length === 0) {
+      throw new Error('Invalid Ghost export: missing or empty db array');
+    }
+    if (!ghostData.db[0].data) {
+      throw new Error('Invalid Ghost export: missing data object');
+    }
+    if (!ghostData.db[0].data.posts || !Array.isArray(ghostData.db[0].data.posts)) {
+      throw new Error('Invalid Ghost export: missing or invalid posts array');
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('❌ Failed to parse Ghost export:', error.message);
+    }
+    throw error;
+  }
 
   const data = ghostData.db[0].data;
   const posts = data.posts.filter((p) => p.status === 'published');

@@ -20,10 +20,11 @@ const {
   page: isPage = false
 } = Astro.props;
 
-// Reading time calculation (simple: ~200 words/min)
+// Reading time calculation
+const WORDS_PER_MINUTE = 200;
 const content = await Astro.slots.render('default');
 const wordCount = content.split(/\s+/).length;
-const readingTime = Math.ceil(wordCount / 200);
+const readingTime = Math.ceil(wordCount / WORDS_PER_MINUTE);
 
 // Schema.org structured data
 const schema = {
