@@ -72,6 +72,11 @@ a {
   text-decoration: none;
 }
 
+a:not(.cta):hover {
+  text-decoration: underline;
+  color: var(--color-accent-hover);
+}
+
 a:hover {
   text-decoration: underline;
   color: var(--color-accent-hover);
@@ -114,6 +119,17 @@ a:hover {
 .cta:hover {
   background: var(--color-accent-hover);
   text-decoration: none;
+  color: #fff; /* keep text readable on blue */
+}
+
+.cta:visited {
+  color: #fff; /* prevent purple/blue visited color */
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--color-accent-hover);
+  outline-offset: 2px;
+  color: #fff; /* keep contrast on focus */
 }
 
 /* Posts Grid */
