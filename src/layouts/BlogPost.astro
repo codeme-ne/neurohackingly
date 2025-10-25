@@ -12,9 +12,13 @@ interface Props {
   image?: { url: string; alt: string };
   hero?: ImageMetadata;
   tags?: string[];
+  page?: boolean;
 }
 
-const { title, description, pubDate, updatedDate, author, image, hero, tags = [] } = Astro.props;
+const {
+  title, description, pubDate, updatedDate, author, image, hero, tags = [],
+  page: isPage = false
+} = Astro.props;
 
 // Reading time calculation (simple: ~200 words/min)
 const content = await Astro.slots.render('default');
@@ -24,7 +28,7 @@ const readingTime = Math.ceil(wordCount / 200);
 // Schema.org structured data
 const schema = {
   '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
+  '@type': isPage ? 'WebPage' : 'BlogPosting',
   headline: title,
   description: description,
   image: image?.url,
@@ -53,7 +57,7 @@ const schema = {
     title={`${title} | Neurohackingly`}
     description={description}
     image={image?.url}
-    article={true}
+    article={!isPage}
     publishedTime={pubDate}
     modifiedTime={updatedDate}
     tags={tags}
@@ -64,6 +68,8 @@ const schema = {
   <nav>
     <a href="/">← Home</a>
     <a href="/blog">Blog</a>
+    <a href="/blog/impossiblelist">Impossible List</a>
+    <a href="/blog/now">Now</a>
     <a href="/newsletter">Newsletter</a>
   </nav>
 
@@ -85,20 +91,24 @@ const schema = {
           <img src={image.url} alt={image.alt} class="feature-image" loading="lazy" decoding="async" />
         )}
         <h1>{title}</h1>
-        <div class="meta">
-          <time datetime={pubDate.toISOString()}>
-            {pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </time>
-          <span>·</span>
-          <span>{readingTime} min read</span>
-          <span>·</span>
-          <span>{author}</span>
-        </div>
-        {tags.length > 0 && (
+        {!isPage && (
+          <div class="meta">
+            <time datetime={pubDate.toISOString()}>
+              {pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </time>
+            <span>·</span>
+            <span>{readingTime} min read</span>
+            <span>·</span>
+            <span>{author}</span>
+          </div>
+        )}
+        {!isPage && tags.length > 0 && (
           <div class="tags">
-            {tags.map(tag => (
-              <a href={`/blog/tag/${tag}`} class="tag">#{tag}</a>
-            ))}
+            {tags
+              .filter(t => !t.toLowerCase().startsWith('hash-'))
+              .map(tag => (
+                <a href={`/blog/tag/${encodeURIComponent(tag)}`} class="tag">#{tag}</a>
+              ))}
           </div>
         )}
       </header>

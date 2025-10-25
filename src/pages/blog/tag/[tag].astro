@@ -1,0 +1,108 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import SEO from '../../../components/SEO.astro';
+import '../../../styles/global.css';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const tags = new Set<string>();
+  for (const p of posts) {
+    for (const t of p.data.tags) {
+      if (!t.toLowerCase().startsWith('hash-')) tags.add(t);
+    }
+  }
+  return Array.from(tags).map((tag) => ({ params: { tag } }));
+}
+
+const currentTag = decodeURIComponent(Astro.params.tag!);
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const filteredPosts = posts
+  .filter((p) =>
+    p.data.tags.some((t) =>
+      !t.toLowerCase().startsWith('hash-') &&
+      t.toLowerCase() === currentTag.toLowerCase()
+    )
+  )
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <SEO
+    title={`#${currentTag} | Tags | Neurohackingly`}
+    description={`Articles tagged "${currentTag}"`}
+  />
+</head>
+<body>
+  <nav>
+    <a href="/">← Home</a>
+    <a href="/blog">Blog</a>
+    <a href="/blog/impossiblelist">Impossible List</a>
+    <a href="/blog/now">Now</a>
+    <a href="/newsletter">Newsletter</a>
+  </nav>
+
+  <main>
+    <header>
+      <h1>#{currentTag}</h1>
+      <p>{filteredPosts.length} article{filteredPosts.length === 1 ? '' : 's'}</p>
+    </header>
+
+    {filteredPosts.length === 0 ? (
+      <p>No posts found for this tag.</p>
+    ) : (
+      <div class="posts-grid">
+        {filteredPosts.map((post) => (
+          <article class="post-card">
+            {post.data.hero ? (
+              <Image
+                src={post.data.hero}
+                alt={post.data.image?.alt ?? ''}
+                widths={[480, 768]}
+                sizes="(max-width: 720px) 100vw, 360px"
+                formats={['avif', 'webp', 'jpeg']}
+                loading="lazy"
+                decoding="async"
+              />
+            ) : post.data.image && (
+              <img src={post.data.image.url} alt={post.data.image.alt} loading="lazy" decoding="async" />
+            )}
+            <div class="post-content">
+              <h2>
+                <a href={`/blog/${post.id}`}>{post.data.title}</a>
+              </h2>
+              {post.data.description?.trim() !== post.data.title?.trim() && (
+                <p>{post.data.description}</p>
+              )}
+              <div class="meta">
+                <time datetime={post.data.pubDate.toISOString()}>
+                  {post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </time>
+                {post.data.tags.length > 0 && (
+                  <>
+                    <span>·</span>
+                    <div class="tags">
+                      {post.data.tags
+                        .filter(t => !t.toLowerCase().startsWith('hash-'))
+                        .slice(0, 3)
+                        .map(tag => (
+                          <a href={`/blog/tag/${encodeURIComponent(tag)}`} class="tag">#{tag}</a>
+                        ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    )}
+  </main>
+
+  <footer>
+    <p>© 2025 Neurohackingly by Lukas Zangerl</p>
+  </footer>
+</body>
+</html>

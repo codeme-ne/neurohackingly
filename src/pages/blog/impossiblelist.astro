@@ -1,0 +1,14 @@
+---
+import { getEntry } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const entry = await getEntry('blog', 'impossiblelist');
+if (!entry) {
+  throw new Error('Entry "impossiblelist" not found');
+}
+const { Content } = await entry.render();
+---
+
+<BlogPost {...entry.data}>
+  <Content />
+</BlogPost>

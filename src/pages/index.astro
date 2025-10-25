@@ -4,8 +4,8 @@ import { Image } from 'astro:assets';
 import SEO from '../components/SEO.astro';
 import '../styles/global.css';
 
-const posts = await getCollection('blog', ({ data }) => !data.draft && data.featured);
-const recentPosts = (await getCollection('blog', ({ data }) => !data.draft))
+const posts = await getCollection('blog', ({ data }) => !data.draft && data.featured && !data.page);
+const recentPosts = (await getCollection('blog', ({ data }) => !data.draft && !data.page))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 6);
 ---
@@ -22,15 +22,39 @@ const recentPosts = (await getCollection('blog', ({ data }) => !data.draft))
   <nav>
     <a href="/" class="active">Home</a>
     <a href="/blog">Blog</a>
+    <a href="/blog/impossiblelist">Impossible List</a>
+    <a href="/blog/now">Now</a>
     <a href="/newsletter">Newsletter</a>
   </nav>
 
   <main>
-    <header class="hero">
-      <h1>Neurohackingly</h1>
-      <p class="tagline">Upgrade your brain, mind, and body</p>
-      <p class="subtitle">Practical strategies for productivity, AI, and personal growth</p>
-      <a href="/blog" class="cta">Read the Blog →</a>
+    <header class="hero hero--split">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <h1>Neurohackingly</h1>
+          <p class="tagline">Upgrade your brain, mind, and body</p>
+          <p class="subtitle">Practical strategies for productivity, AI, and personal growth</p>
+
+          <form class="signup" action="/newsletter" method="get" aria-label="Join the newsletter">
+            <label class="sr-only" for="hero-email">Email address</label>
+            <input id="hero-email" name="email" type="email" placeholder="Email address" autocomplete="email" required />
+            <button class="cta" type="submit">Subscribe</button>
+          </form>
+        </div>
+
+        <div class="hero-media" aria-label="Featured video">
+          <div class="video-wrapper">
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/lmrUcdGyguA?rel=0"
+              title="YouTube video"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
+      </div>
     </header>
 
     <section class="recent-posts">
@@ -55,7 +79,9 @@ const recentPosts = (await getCollection('blog', ({ data }) => !data.draft))
               <h3>
                 <a href={`/blog/${post.id}`}>{post.data.title}</a>
               </h3>
-              <p>{post.data.description}</p>
+              {post.data.description?.trim() !== post.data.title?.trim() && (
+                <p>{post.data.description}</p>
+              )}
               <time datetime={post.data.pubDate.toISOString()}>
                 {post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
               </time>
@@ -82,3 +108,122 @@ const recentPosts = (await getCollection('blog', ({ data }) => !data.draft))
   </footer>
 </body>
 </html>
+
+<style>
+  /* Ali Abdaal-like hero: left copy + right video */
+  .hero {
+    text-align: left;
+    padding: 3rem 0 4rem;
+  }
+
+  .hero h1 {
+    font-size: 2.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+
+  .hero .tagline {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: 0.5rem;
+  }
+
+  .hero .subtitle {
+    font-size: 1.1rem;
+    color: var(--color-text-light);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  /* Header layout: copy left, video right on desktop; stacked on mobile */
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .hero-inner {
+      grid-template-columns: 1.2fr 1fr;
+      gap: 3rem;
+    }
+    .hero h1 {
+      font-size: 3.5rem;
+    }
+  }
+
+  /* Inline signup like the theme */
+  .signup {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    max-width: 540px;
+  }
+
+  .signup input[type="email"] {
+    font: inherit;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background: var(--color-bg, #fff);
+    color: inherit;
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  .signup input[type="email"]:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .signup .cta {
+    margin: 0;
+    white-space: nowrap;
+    padding: 0.85rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  .hero-media .video-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .hero-media iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (max-width: 899px) {
+    .hero {
+      padding: 2rem 0 3rem;
+    }
+    .hero h1 {
+      font-size: 2.25rem;
+    }
+    .hero .tagline {
+      font-size: 1.25rem;
+    }
+  }
+</style>

@@ -15,7 +15,8 @@ const blog = defineCollection({
     hero: image().optional(), // Astro 5 optimized image (AVIF/WebP/responsive)
     tags: z.array(z.string()).default([]),
     featured: z.boolean().default(false),
-    draft: z.boolean().default(false)
+    draft: z.boolean().default(false),
+    page: z.boolean().default(false)
   })
 });
 
@@ -34,7 +35,8 @@ const de = defineCollection({
     hero: image().optional(), // Astro 5 optimized image (AVIF/WebP/responsive)
     tags: z.array(z.string()).default([]),
     featured: z.boolean().default(false),
-    draft: z.boolean().default(false)
+    draft: z.boolean().default(false),
+    page: z.boolean().default(false)
   })
 });
 
