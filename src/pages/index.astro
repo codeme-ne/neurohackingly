@@ -59,46 +59,6 @@ const recentPosts = (await getCollection('blog', ({ data }) => !data.draft && !d
         </div>
       </div>
     </header>
-
-    <section class="recent-posts">
-      <h2>Recent Articles</h2>
-      <div class="posts-grid">
-        {recentPosts.map((post) => (
-          <article class="post-card">
-            {post.data.hero ? (
-              <Image
-                src={post.data.hero}
-                alt={post.data.image?.alt ?? ''}
-                widths={[480, 768]}
-                sizes="(max-width: 720px) 100vw, 360px"
-                formats={['avif', 'webp', 'jpeg']}
-                loading="lazy"
-                decoding="async"
-              />
-            ) : post.data.image && (
-              <img src={post.data.image.url} alt={post.data.image.alt} loading="lazy" decoding="async" />
-            )}
-            <div class="post-content">
-              <h3>
-                <a href={`/blog/${post.id}`}>{post.data.title}</a>
-              </h3>
-              {post.data.description?.trim() !== post.data.title?.trim() && (
-                <p>{post.data.description}</p>
-              )}
-              <time datetime={post.data.pubDate.toISOString()}>
-                {post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-              </time>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-
-    <section class="newsletter-cta">
-      <h2>Join the Newsletter</h2>
-      <p>Get actionable productivity tips and insights delivered weekly</p>
-      <a href="/newsletter" class="cta">Subscribe Now →</a>
-    </section>
   </main>
 
   <footer>
@@ -120,17 +80,21 @@ const recentPosts = (await getCollection('blog', ({ data }) => !data.draft && !d
   }
 
   .hero h1 {
+    font-family: var(--font-serif);
     font-size: 2.75rem;
-    font-weight: 700;
+    font-weight: 800;
     margin-bottom: 0.5rem;
     line-height: 1.2;
+    letter-spacing: -0.02em;
   }
 
   .hero .tagline {
+    font-family: var(--font-serif);
     font-size: 1.5rem;
-    font-weight: 500;
+    font-weight: 400;
     color: var(--color-text);
     margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
   }
 
   .hero .subtitle {
@@ -155,6 +119,7 @@ const recentPosts = (await getCollection('blog', ({ data }) => !data.draft && !d
     }
     .hero h1 {
       font-size: 3.5rem;
+      letter-spacing: -0.025em;
     }
   }
 
@@ -170,17 +135,23 @@ const recentPosts = (await getCollection('blog', ({ data }) => !data.draft && !d
   .signup input[type="email"] {
     font: inherit;
     padding: 0.85rem 1rem;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-light);
     border-radius: 0.375rem;
     background: var(--color-bg, #fff);
     color: inherit;
     width: 100%;
     font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .signup input[type="email"]:hover {
+    border-color: var(--color-border);
   }
 
   .signup input[type="email"]:focus {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-text);
     outline-offset: 2px;
+    border-color: var(--color-text);
   }
 
   .signup .cta {
@@ -218,15 +189,33 @@ const recentPosts = (await getCollection('blog', ({ data }) => !data.draft && !d
     height: 100%;
   }
 
-  @media (max-width: 899px) {
+  @media (max-width: 809px) {
     .hero {
-      padding: 2rem 0 3rem;
+      padding: 2.5rem 0 3rem;
     }
     .hero h1 {
       font-size: 2.25rem;
+      letter-spacing: -0.02em;
     }
     .hero .tagline {
-      font-size: 1.25rem;
+      font-size: 1.35rem;
+    }
+    .hero .subtitle {
+      font-size: 1.05rem;
+    }
+    .signup {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .hero h1 {
+      font-size: 4rem;
+      letter-spacing: -0.035em;
+    }
+    .hero .tagline {
+      font-size: 2rem;
     }
   }
 
@@ -235,21 +224,71 @@ const recentPosts = (await getCollection('blog', ({ data }) => !data.draft && !d
     font-size: 0.95rem;
   }
   .signup-feedback.success {
-    color: #1b7b2c;
+    color: var(--color-text);
+    background: var(--color-accent);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
     font-weight: 600;
   }
   .signup-feedback.error {
     color: #b00020;
+    background: #fef2f2;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
   }
   .signup[aria-busy="true"] .cta {
     opacity: 0.7;
     pointer-events: none;
   }
+
+  .newsletter-cta {
+    margin: 4rem auto;
+    padding: 0 1rem;
+  }
+
+  .newsletter-card {
+    max-width: 540px;
+    margin: 0 auto;
+    padding: 2.25rem 2rem;
+    text-align: center;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-border-light);
+    background: #ffffff;
+    box-shadow: 0 16px 40px var(--color-overlay);
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .newsletter-card h2 {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    margin: 0;
+    font-size: clamp(1.65rem, 2vw, 1.95rem);
+    letter-spacing: -0.01em;
+  }
+
+  .newsletter-card p {
+    margin: 0;
+    color: var(--color-text-light);
+    font-size: 1rem;
+  }
+
+  .newsletter-card .cta {
+    justify-self: center;
+    padding-inline: 1.75rem;
+  }
+
+  @media (max-width: 480px) {
+    .newsletter-card {
+      padding: 2rem 1.5rem;
+    }
+  }
 </style>
 
 <!-- lightweight confetti + inline signup handler -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js" defer></script>
-<script>
+<script is:inline>
+  // @ts-nocheck
   window.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('form.signup');
     const emailInput = /** @type {HTMLInputElement|null} */(document.getElementById('hero-email'));

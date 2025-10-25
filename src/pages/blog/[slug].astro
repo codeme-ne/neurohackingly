@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
 
 export async function getStaticPaths() {
@@ -10,7 +10,19 @@ export async function getStaticPaths() {
   }));
 }
 
-const { post } = Astro.props;
+// In SSR mode, getStaticPaths is ignored, so we need to fetch the post manually
+const { slug } = Astro.params;
+let post = Astro.props.post;
+
+if (!post) {
+  // SSR mode - fetch the post based on slug
+  post = await getEntry('blog', slug as string);
+
+  if (!post || post.data.draft || post.data.page) {
+    return Astro.redirect('/404');
+  }
+}
+
 const { Content } = await post.render();
 ---
 
