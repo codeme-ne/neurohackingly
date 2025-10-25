@@ -35,11 +35,14 @@ const recentPosts = (await getCollection('blog', ({ data }) => !data.draft && !d
           <p class="tagline">Upgrade your brain, mind, and body</p>
           <p class="subtitle">Practical strategies for productivity, AI, and personal growth</p>
 
-          <form class="signup" action="/newsletter" method="get" aria-label="Join the newsletter">
+          <form class="signup" action="/api/subscribe" method="post" aria-label="Join the newsletter" novalidate>
             <label class="sr-only" for="hero-email">Email address</label>
             <input id="hero-email" name="email" type="email" placeholder="Email address" autocomplete="email" required />
+            <input type="hidden" name="source" value="home-hero" />
+            <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true" />
             <button class="cta" type="submit">Subscribe</button>
           </form>
+          <div class="signup-feedback" aria-live="polite" role="status"></div>
         </div>
 
         <div class="hero-media" aria-label="Featured video">
@@ -226,4 +229,93 @@ const recentPosts = (await getCollection('blog', ({ data }) => !data.draft && !d
       font-size: 1.25rem;
     }
   }
+
+  .signup-feedback {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+  }
+  .signup-feedback.success {
+    color: #1b7b2c;
+    font-weight: 600;
+  }
+  .signup-feedback.error {
+    color: #b00020;
+  }
+  .signup[aria-busy="true"] .cta {
+    opacity: 0.7;
+    pointer-events: none;
+  }
 </style>
+
+<!-- lightweight confetti + inline signup handler -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js" defer></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('form.signup');
+    const emailInput = /** @type {HTMLInputElement|null} */(document.getElementById('hero-email'));
+    const feedback = document.querySelector('.signup-feedback');
+    if (!form || !emailInput || !feedback) return;
+
+    const setMessage = (text, type = 'info') => {
+      feedback.textContent = text;
+      feedback.classList.remove('success', 'error', 'info');
+      feedback.classList.add(type);
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.setAttribute('disabled', 'true');
+      form.setAttribute('aria-busy', 'true');
+      setMessage('Subscribing…', 'info');
+
+      try {
+        const fd = new FormData(form);
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: fd,
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'fetch'
+          }
+        });
+        let status = 'error';
+        let data = null;
+        if (res.ok) {
+          const ct = res.headers.get('content-type') || '';
+          if (ct.includes('application/json')) {
+            data = await res.json();
+            status = data?.status || 'error';
+          } else {
+            status = 'success';
+          }
+        }
+
+        if (status === 'success' || status === 'already') {
+          setMessage(status === 'success' ? 'Thanks! Check your inbox to confirm.' : 'You are already subscribed.');
+          feedback.classList.add('success');
+          try {
+            if (typeof window.confetti === 'function') {
+              window.confetti({
+                particleCount: 120,
+                spread: 70,
+                origin: { y: 0.6 }
+              });
+            }
+          } catch {}
+          emailInput.value = '';
+        } else {
+          const host = location.hostname;
+          const isLocal = host === 'localhost' || host === '127.0.0.1';
+          const detail = data?.error ? ` (${String(data.error).slice(0, 140)})` : '';
+          setMessage(isLocal ? `Something went wrong${detail}.` : 'Something went wrong. Please try again.', 'error');
+        }
+      } catch (err) {
+        setMessage('Network error. Please try again.', 'error');
+      } finally {
+        if (submitBtn) submitBtn.removeAttribute('disabled');
+        form.removeAttribute('aria-busy');
+      }
+    });
+  });
+</script>

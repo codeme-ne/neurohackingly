@@ -41,3 +41,24 @@ All commands are run from the root of the project, from a terminal:
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+## Newsletter (Kit) setup
+
+- API routes require non-static output. This repo uses `output: 'hybrid'` in `astro.config.mjs` so `/api/subscribe` runs on Vercel as a serverless function.
+- Create `.env.local` and set:
+
+```
+# Prefer this on the server
+KIT_API_SECRET=your_convertkit_api_secret
+
+# Or use API key if you don't have the secret
+# KIT_API_KEY=your_convertkit_api_key
+
+# Subscribe target
+KIT_FORM_ID=your_convertkit_form_id
+# Or, alternatively:
+# KIT_TAG_ID=your_convertkit_tag_id
+```
+
+- Production: set the same variables in Vercel → Project Settings → Environment Variables.
+- The endpoint at `src/pages/api/subscribe.ts` supports both Form-based and Tag-based subscription and includes a honeypot + simple rate limiting. Forms on the homepage and newsletter page add a hidden `source` field for basic attribution.

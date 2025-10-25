@@ -1,6 +1,8 @@
 ---
 import SEO from '../components/SEO.astro';
 import '../styles/global.css';
+
+const status = Astro.url.searchParams.get('status');
 ---
 
 <!DOCTYPE html>
@@ -28,6 +30,21 @@ import '../styles/global.css';
         Every Sunday, get practical productivity tips, AI insights, and science-backed strategies
         delivered straight to your inbox.
       </p>
+      {status === 'success' && (
+        <p style="margin-top: 1rem; color: #1b7b2c; font-weight: 600;">
+          Thanks! Check your inbox to confirm your subscription.
+        </p>
+      )}
+      {status === 'already' && (
+        <p style="margin-top: 1rem; color: #444;">
+          Looks like you are already subscribed. Appreciate having you here!
+        </p>
+      )}
+      {status === 'error' && (
+        <p style="margin-top: 1rem; color: #b00020;">
+          Something went wrong. Please try again or email me at neurohackingly@gmail.com.
+        </p>
+      )}
     </header>
 
     <section style="max-width: 500px; margin: 3rem auto; text-align: center;">
@@ -35,21 +52,30 @@ import '../styles/global.css';
         Join a growing community of readers who are upgrading their brain, mind, and body.
       </p>
 
-      <!-- Placeholder for newsletter form -->
       <div style="padding: 2rem; background: #f9f9f9; border-radius: 0.5rem;">
         <h3>Subscribe Now</h3>
         <p style="font-size: 0.9rem; color: #666; margin: 1rem 0;">
-          Newsletter integration coming soon. Add your email service (ConvertKit, Mailchimp, etc.)
+          Practical Sunday systems and science-backed prompts—no spam, ever.
         </p>
 
-        <!-- Example form structure -->
-        <form style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+        <form action="/api/subscribe" method="post" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;" novalidate>
           <input
             type="email"
-            placeholder="your@email.com"
+            name="email"
+            placeholder="you@example.com"
+            autocomplete="email"
             required
             style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 0.25rem; font-size: 1rem;"
           />
+          <input
+            type="text"
+            name="name"
+            placeholder="First name (optional)"
+            autocomplete="given-name"
+            style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 0.25rem; font-size: 1rem;"
+          />
+          <input type="hidden" name="source" value="newsletter-page" />
+          <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true" />
           <button
             type="submit"
             style="padding: 0.75rem; background: #0066cc; color: white; border: none; border-radius: 0.25rem; font-weight: 600; cursor: pointer;"
