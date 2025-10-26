@@ -223,20 +223,38 @@ const navId = `site-nav-${Math.random().toString(36).slice(2, 9)}`;
       const nav = header.querySelector('[data-site-nav]') as HTMLElement | null;
       const links = header.querySelectorAll<HTMLAnchorElement>('[data-nav-link]');
 
+      let lastFocused: HTMLElement | null = null;
       const closeMenu = () => {
         header.classList.remove('is-open');
         toggle?.setAttribute('aria-expanded', 'false');
+        // restore focus for a11y
+        if (lastFocused && document.contains(lastFocused)) {
+          (toggle ?? lastFocused).focus();
+        } else {
+          toggle?.focus();
+        }
       };
 
       toggle?.addEventListener('click', () => {
         const isOpen = header.classList.toggle('is-open');
         toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        if (isOpen) {
+          lastFocused = (document.activeElement as HTMLElement) ?? null;
+        }
       });
 
       links.forEach((link) => {
         link.addEventListener('click', () => {
           closeMenu();
         });
+      });
+
+      // Escape closes
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && header.classList.contains('is-open')) {
+          e.stopPropagation();
+          closeMenu();
+        }
       });
 
       const handleResize = () => {
