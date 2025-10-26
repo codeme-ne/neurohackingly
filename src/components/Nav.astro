@@ -1,4 +1,6 @@
 ---
+import Search from './Search.astro';
+
 const pathname = Astro.url.pathname;
 
 const navLinks = [
@@ -36,15 +38,26 @@ const navId = `site-nav-${Math.random().toString(36).slice(2, 9)}`;
     </button>
 
     <nav class="site-nav" id={navId} data-site-nav>
-      {navLinks.map((link) => (
-        <a
-          href={link.href}
-          class={`site-nav__link${isActive(link.href) ? ' is-active' : ''}`}
-          data-nav-link
-        >
-          {link.label}
-        </a>
-      ))}
+      <div class="site-nav__inner">
+        <div class="site-nav__search" data-nav-search>
+          <Search placeholder="Search the site" label="Search the site" />
+        </div>
+
+        <div class="site-nav__section">
+          <span class="site-nav__section-title">Pages</span>
+          <div class="site-nav__links" data-nav-links>
+            {navLinks.map((link) => (
+              <a
+                href={link.href}
+                class={`site-nav__link${isActive(link.href) ? ' is-active' : ''}`}
+                data-nav-link
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
     </nav>
   </div>
 </header>
@@ -98,7 +111,32 @@ const navId = `site-nav-${Math.random().toString(36).slice(2, 9)}`;
   .site-nav {
     display: flex;
     align-items: center;
+  }
+
+  .site-nav__inner {
+    display: flex;
+    align-items: center;
     gap: 1.25rem;
+  }
+
+  .site-nav__search {
+    display: none;
+  }
+
+  .site-nav__section {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .site-nav__links {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .site-nav__section-title {
+    display: none;
   }
 
   .site-nav__link {
@@ -167,7 +205,7 @@ const navId = `site-nav-${Math.random().toString(36).slice(2, 9)}`;
     display: block;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     .site-header__inner {
       padding: 0.65rem 1rem;
     }
@@ -180,15 +218,14 @@ const navId = `site-nav-${Math.random().toString(36).slice(2, 9)}`;
       position: absolute;
       left: 1rem;
       right: 1rem;
-      top: calc(100% + 0.5rem);
+      top: calc(100% + 0.75rem);
       flex-direction: column;
-      align-items: flex-start;
-      gap: 0.25rem;
-      padding: 0.75rem 1rem;
-      border-radius: 12px;
-      border: 1px solid rgba(219, 219, 219, 0.9);
-      background: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 18px 40px rgba(23, 28, 38, 0.08);
+      align-items: stretch;
+      padding: 1rem 1.1rem;
+      border-radius: 16px;
+      border: 1px solid rgba(219, 219, 219, 0.8);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 18px 42px rgba(23, 28, 38, 0.14);
       opacity: 0;
       pointer-events: none;
       transform: translateY(-0.5rem);
@@ -201,14 +238,79 @@ const navId = `site-nav-${Math.random().toString(36).slice(2, 9)}`;
       transform: translateY(0);
     }
 
+    .site-nav__inner {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1.15rem;
+    }
+
+    .site-nav__search {
+      display: block;
+    }
+
+    .site-nav__search .search-container {
+      max-width: 100%;
+      margin: 0;
+    }
+
+    .site-nav__search .search-wrapper {
+      gap: 0.5rem;
+    }
+
+    .site-nav__search .search-input {
+      padding: 0.85rem 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 28, 38, 0.14);
+      background: rgba(244, 245, 246, 0.95);
+      font-size: 0.95rem;
+    }
+
+    .site-nav__search .search-input:focus {
+      border-color: rgba(23, 28, 38, 0.25);
+      box-shadow: 0 0 0 3px rgba(23, 28, 38, 0.12);
+    }
+
+    .site-nav__search .search-status {
+      font-size: 0.8rem;
+      color: rgba(23, 28, 38, 0.55);
+    }
+
+    .site-nav__section {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.65rem;
+    }
+
+    .site-nav__section-title {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(23, 28, 38, 0.55);
+    }
+
+    .site-nav__links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
     .site-nav__link {
       width: 100%;
-      padding: 0.5rem 0;
+      padding: 0.45rem 0;
+      font-size: 1rem;
     }
 
     .site-nav__link::after {
       bottom: 0;
       height: 1px;
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .site-nav__links {
+      gap: 1.25rem;
     }
   }
 </style>
@@ -223,6 +325,8 @@ const navId = `site-nav-${Math.random().toString(36).slice(2, 9)}`;
       const nav = header.querySelector('[data-site-nav]') as HTMLElement | null;
       const links = header.querySelectorAll<HTMLAnchorElement>('[data-nav-link]');
 
+      const searchInput = header.querySelector<HTMLInputElement>('[data-nav-search] [data-search-input]');
+
       const closeMenu = () => {
         header.classList.remove('is-open');
         toggle?.setAttribute('aria-expanded', 'false');
@@ -231,6 +335,11 @@ const navId = `site-nav-${Math.random().toString(36).slice(2, 9)}`;
       toggle?.addEventListener('click', () => {
         const isOpen = header.classList.toggle('is-open');
         toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        if (isOpen) {
+          requestAnimationFrame(() => {
+            searchInput?.focus();
+          });
+        }
       });
 
       links.forEach((link) => {
@@ -240,7 +349,7 @@ const navId = `site-nav-${Math.random().toString(36).slice(2, 9)}`;
       });
 
       const handleResize = () => {
-        if (window.innerWidth > 768) {
+        if (window.innerWidth > 1024) {
           closeMenu();
         }
       };
@@ -252,6 +361,16 @@ const navId = `site-nav-${Math.random().toString(36).slice(2, 9)}`;
       if (nav) {
         document.addEventListener('click', (event) => {
           if (!header.contains(event.target as Node)) {
+            closeMenu();
+          }
+        });
+      }
+
+      const searchRoot = header.querySelector('[data-nav-search] [data-search-root]');
+      if (searchRoot) {
+        searchRoot.addEventListener('click', (event) => {
+          const target = event.target as HTMLElement;
+          if (target.closest('a.search-result-item')) {
             closeMenu();
           }
         });
