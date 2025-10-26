@@ -1,44 +1,103 @@
 ---
 import { Image } from 'astro:assets';
 import SEO from '../components/SEO.astro';
+import ScrollProgress from '../components/ScrollProgress.astro';
+import Nav from '../components/Nav.astro';
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description: string;
-  pubDate: Date;
+  pubDate?: Date;
   updatedDate?: Date;
   author: string;
   image?: { url: string; alt: string };
   hero?: ImageMetadata;
   tags?: string[];
   page?: boolean;
+  readingTime?: number;
+  topics?: string[];
 }
 
 const {
-  title, description, pubDate, updatedDate, author, image, hero, tags = [],
-  page: isPage = false
+  title,
+  description,
+  pubDate: rawPubDate,
+  updatedDate: rawUpdatedDate,
+  author,
+  image,
+  hero,
+  tags = [],
+  page: isPage = false,
+  readingTime: frontmatterReadingTime,
+  topics = []
 } = Astro.props;
+
+const pubDate = rawPubDate instanceof Date ? rawPubDate : undefined;
+const updatedDate = rawUpdatedDate instanceof Date ? rawUpdatedDate : undefined;
+
+if (!isPage && !pubDate) {
+  throw new Error('BlogPost layout requires a pubDate for blog content.');
+}
 
 // Reading time calculation
 const WORDS_PER_MINUTE = 200;
 const content = await Astro.slots.render('default');
 const wordCount = content.split(/\s+/).length;
-const readingTime = Math.ceil(wordCount / WORDS_PER_MINUTE);
+const computedReadingTime = Math.ceil(wordCount / WORDS_PER_MINUTE);
+const readingMinutes = typeof frontmatterReadingTime === 'number' && frontmatterReadingTime > 0
+  ? Math.round(frontmatterReadingTime)
+  : computedReadingTime;
+
+const isGerman = Astro.url.pathname.startsWith('/de');
+const locale = isGerman ? 'de-DE' : 'en-US';
+
+const authorSocials = {
+  twitter: '@neurohackingly',
+  linkedin: 'https://www.linkedin.com/in/lukzan',
+  github: 'https://github.com/codeme-ne',
+  website: 'https://neurohackingly.com/about'
+};
+
+const authorSameAs = Array.from(new Set([
+  authorSocials.twitter ? `https://twitter.com/${authorSocials.twitter.replace('@', '')}` : undefined,
+  authorSocials.linkedin,
+  authorSocials.github,
+  authorSocials.website
+].filter(Boolean)));
+
+const mergedTags = Array.from(new Set([...tags, ...topics]));
+const baseCategory = topics[0] ?? tags[0] ?? (isPage ? 'page' : 'blog');
+const primaryTopic = baseCategory.toLowerCase();
+const timeRequired = `PT${Math.max(1, readingMinutes)}M`;
 
 // Schema.org structured data
+const effectiveModifiedDate = updatedDate ?? pubDate;
+
 const schema = {
   '@context': 'https://schema.org',
   '@type': isPage ? 'WebPage' : 'BlogPosting',
   headline: title,
-  description: description,
+  description,
   image: image?.url,
-  datePublished: pubDate.toISOString(),
-  dateModified: (updatedDate || pubDate).toISOString(),
+  ...(pubDate && { datePublished: pubDate.toISOString() }),
+  ...(effectiveModifiedDate && { dateModified: effectiveModifiedDate.toISOString() }),
+  inLanguage: locale,
+  timeRequired,
+  wordCount,
+  ...(mergedTags.length > 0 && { keywords: mergedTags.join(', ') }),
+  ...(topics.length > 0 && {
+    about: topics.map(topic => ({
+      '@type': 'Thing',
+      name: topic
+    }))
+  }),
+  ...(!isPage && primaryTopic && { articleSection: primaryTopic }),
   author: {
     '@type': 'Person',
     name: author,
-    url: 'https://neurohackingly.com/about'
+    url: authorSocials.website,
+    sameAs: authorSameAs
   },
   publisher: {
     '@type': 'Organization',
@@ -52,27 +111,25 @@ const schema = {
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang={isGerman ? 'de' : 'en'}>
 <head>
   <SEO
     title={`${title} | Neurohackingly`}
     description={description}
     image={image?.url}
+    imageAlt={image?.alt}
     article={!isPage}
     publishedTime={pubDate}
     modifiedTime={updatedDate}
-    tags={tags}
+    tags={mergedTags}
+    category={primaryTopic}
+    authorSocials={authorSocials}
+    structuredData={[schema]}
   />
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 </head>
 <body>
-  <nav>
-    <a href="/">← Home</a>
-    <a href="/blog">Blog</a>
-    <a href="/blog/impossiblelist">Impossible List</a>
-    <a href="/blog/now">Now</a>
-    <a href="/newsletter">Newsletter</a>
-  </nav>
+  <ScrollProgress />
+  <Nav />
 
   <main>
     <article>
@@ -98,7 +155,7 @@ const schema = {
               {pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
             </time>
             <span>·</span>
-            <span>{readingTime} min read</span>
+            <span>{readingMinutes} min read</span>
             <span>·</span>
             <span>{author}</span>
           </div>

@@ -1,0 +1,16 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-default" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A" />
+      <stop offset="1" stop-color="#1E293B" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" rx="32" fill="url(#bg-default)" />
+  <rect x="40" y="40" width="1120" height="550" rx="28" fill="rgba(15, 23, 42, 0.65)" stroke="rgba(229, 252, 129, 0.35)" stroke-width="2" />
+  <text x="100" y="280" fill="#E5FC81" font-family="'Inter', 'Segoe UI', sans-serif" font-size="88" font-weight="700">
+    Neurohackingly
+  </text>
+  <text x="100" y="360" fill="#E2E8F0" font-family="'Inter', 'Segoe UI', sans-serif" font-size="40" font-weight="500" letter-spacing="0.02em">
+    Upgrade your brain, mind, and body
+  </text>
+</svg>

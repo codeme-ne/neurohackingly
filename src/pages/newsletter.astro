@@ -1,5 +1,7 @@
 ---
 import SEO from '../components/SEO.astro';
+import ScrollProgress from '../components/ScrollProgress.astro';
+import Nav from '../components/Nav.astro';
 import '../styles/global.css';
 
 const status = Astro.url.searchParams.get('status');
@@ -11,16 +13,12 @@ const status = Astro.url.searchParams.get('status');
   <SEO
     title="Newsletter | Neurohackingly"
     description="Join the Neurohackingly newsletter for weekly insights on productivity, AI, and personal-growth"
+    category="newsletter"
   />
 </head>
 <body>
-  <nav>
-    <a href="/">← Home</a>
-    <a href="/blog">Blog</a>
-    <a href="/blog/impossiblelist">Impossible List</a>
-    <a href="/blog/now">Now</a>
-    <a href="/newsletter" class="active">Newsletter</a>
-  </nav>
+  <ScrollProgress />
+  <Nav />
 
   <main>
     <header class="hero">

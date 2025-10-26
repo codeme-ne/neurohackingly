@@ -1,37 +1,113 @@
 ---
+type StructuredData = Record<string, unknown>;
+
+interface AuthorSocials {
+  twitter?: string;
+  linkedin?: string;
+  github?: string;
+  website?: string;
+  mastodon?: string;
+}
+
 interface Props {
   title: string;
   description: string;
   image?: string;
+  imageAlt?: string;
   article?: boolean;
   publishedTime?: Date;
   modifiedTime?: Date;
   tags?: string[];
+  canonical?: string;
+  noindex?: boolean;
+  structuredData?: StructuredData | StructuredData[];
+  authorSocials?: AuthorSocials;
+  category?: string;
 }
+
+const fallbackImages: Record<string, string> = {
+  default: '/images/og/default.svg',
+  blog: '/images/og/blog.svg',
+  newsletter: '/images/og/newsletter.svg',
+  learning: '/images/og/learning.svg',
+  tools: '/images/og/tools.svg',
+  home: '/images/og/default.svg',
+  page: '/images/og/default.svg'
+};
 
 const {
   title,
   description,
-  image = '/og-image.jpg',
+  image,
+  imageAlt,
   article = false,
   publishedTime,
   modifiedTime,
   tags = [],
-} = Astro.props;
+  canonical,
+  noindex = false,
+  structuredData,
+  authorSocials,
+  category
+}: Props = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const socialImage = new URL(image, Astro.site);
+const categoryKey = category?.toLowerCase() ?? 'default';
+const fallbackImage = fallbackImages[categoryKey] ?? fallbackImages.default;
+const socialImagePath = image ?? fallbackImage;
+
+const canonicalInput = canonical ?? (Astro.url.pathname || '/');
+const canonicalURL = canonicalInput.startsWith('http')
+  ? new URL(canonicalInput)
+  : new URL(canonicalInput, Astro.site);
+
+const socialImage = new URL(socialImagePath, Astro.site);
+
+const isGerman = Astro.url.pathname.startsWith('/de');
+const locale = isGerman ? 'de-DE' : 'en-US';
+const ogLocale = locale.replace('-', '_');
+
+const englishPath = Astro.url.pathname.replace(/^\/de/, '') || '/';
+const englishURL = new URL(englishPath, Astro.site);
+
+const normalizedTwitterHandle = authorSocials?.twitter
+  ? authorSocials.twitter.startsWith('@')
+    ? authorSocials.twitter
+    : `@${authorSocials.twitter}`
+  : undefined;
+
+const socialProfiles = [
+  normalizedTwitterHandle ? `https://twitter.com/${normalizedTwitterHandle.replace('@', '')}` : undefined,
+  authorSocials?.linkedin,
+  authorSocials?.github,
+  authorSocials?.website,
+  authorSocials?.mastodon
+].filter((value): value is string => Boolean(value));
+
+const jsonLdEntries = structuredData
+  ? (Array.isArray(structuredData) ? structuredData : [structuredData])
+  : [];
 ---
 
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="sitemap" href="/sitemap-index.xml" />
+{noindex && <meta name="robots" content="noindex,follow" />}
+
+{isGerman ? (
+  <>
+    <link rel="alternate" hrefLang="de" href={canonicalURL} />
+    <link rel="alternate" hrefLang="en" href={englishURL} />
+  </>
+) : (
+  <link rel="alternate" hrefLang="en" href={canonicalURL} />
+)}
 
 <!-- Primary -->
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 <link rel="canonical" href={canonicalURL} />
+<meta name="language" content={locale} />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={article ? 'article' : 'website'} />
@@ -39,9 +115,14 @@ const socialImage = new URL(image, Astro.site);
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={socialImage} />
+{imageAlt && <meta property="og:image:alt" content={imageAlt} />}
+<meta property="og:site_name" content="Neurohackingly" />
+<meta property="og:locale" content={ogLocale} />
+{isGerman ? <meta property="og:locale:alternate" content="en_US" /> : <meta property="og:locale:alternate" content="de_DE" />}
 {article && publishedTime && <meta property="article:published_time" content={publishedTime.toISOString()} />}
 {article && modifiedTime && <meta property="article:modified_time" content={modifiedTime.toISOString()} />}
 {article && tags.map(tag => <meta property="article:tag" content={tag} />)}
+{article && socialProfiles.map(profile => <meta property="article:author" content={profile} />)}
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
@@ -49,7 +130,13 @@ const socialImage = new URL(image, Astro.site);
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={socialImage} />
+{imageAlt && <meta name="twitter:image:alt" content={imageAlt} />}
 <meta name="twitter:site" content="@neurohackingly" />
+{normalizedTwitterHandle && <meta name="twitter:creator" content={normalizedTwitterHandle} />}
 
 <!-- RSS -->
 <link rel="alternate" type="application/rss+xml" title="Neurohackingly RSS Feed" href="/rss.xml" />
+
+{jsonLdEntries.map((entry) => (
+  <script type="application/ld+json" set:html={JSON.stringify(entry, null, 2)} />
+))}

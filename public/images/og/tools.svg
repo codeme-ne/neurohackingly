@@ -1,0 +1,16 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-tools" x1="1200" y1="630" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F97316" />
+      <stop offset="1" stop-color="#DB2777" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" rx="32" fill="url(#bg-tools)" />
+  <rect x="44" y="44" width="1112" height="542" rx="26" fill="rgba(15, 23, 42, 0.54)" stroke="rgba(255, 237, 213, 0.4)" stroke-width="2" />
+  <text x="96" y="276" fill="#FEFCE8" font-family="'Inter', 'Segoe UI', sans-serif" font-size="82" font-weight="700">
+    Toolkits &amp; Systems
+  </text>
+  <text x="96" y="356" fill="#FFE4E6" font-family="'Inter', 'Segoe UI', sans-serif" font-size="36" font-weight="500" letter-spacing="0.02em">
+    Templates and AI stacks to automate deep work and delivery
+  </text>
+</svg>
