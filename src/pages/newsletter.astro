@@ -21,7 +21,7 @@ const status = Astro.url.searchParams.get('status');
   <Nav />
 
   <main>
-    <header class="hero">
+    <header class="hero newsletter-hero">
       <h1>Sunday Shares</h1>
       <p class="tagline">Your Weekly Dose of Actionable Insights</p>
       <p class="subtitle">
@@ -29,61 +29,66 @@ const status = Astro.url.searchParams.get('status');
         delivered straight to your inbox.
       </p>
       {status === 'success' && (
-        <p style="margin-top: 1rem; color: #1b7b2c; font-weight: 600;">
+        <p class="newsletter-status newsletter-status--success">
           Thanks! Check your inbox to confirm your subscription.
         </p>
       )}
       {status === 'already' && (
-        <p style="margin-top: 1rem; color: #444;">
+        <p class="newsletter-status newsletter-status--info">
           Looks like you are already subscribed. Appreciate having you here!
         </p>
       )}
       {status === 'error' && (
-        <p style="margin-top: 1rem; color: #b00020;">
+        <p class="newsletter-status newsletter-status--error">
           Something went wrong. Please try again or email me at neurohackingly@gmail.com.
         </p>
       )}
     </header>
 
-    <section style="max-width: 500px; margin: 3rem auto; text-align: center;">
-      <p style="margin-bottom: 2rem; color: #666;">
+    <section class="newsletter-section">
+      <p class="newsletter-lede">
         Join a growing community of readers who are upgrading their brain, mind, and body.
       </p>
 
-      <div style="padding: 2rem; background: #f9f9f9; border-radius: 0.5rem;">
+      <div class="newsletter-card">
         <h3>Subscribe Now</h3>
-        <p style="font-size: 0.9rem; color: #666; margin: 1rem 0;">
+        <p class="newsletter-subcopy">
           Practical Sunday systems and science-backed prompts—no spam, ever.
         </p>
 
-        <form action="/api/subscribe" method="post" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;" novalidate>
-          <input
+        <form action="/api/subscribe" method="post" class="newsletter-form" novalidate>
+          <div class="newsletter-field">
+            <label class="newsletter-label" for="newsletter-email">Email address</label>
+            <input
             type="email"
             name="email"
+            id="newsletter-email"
             placeholder="you@example.com"
             autocomplete="email"
             required
-            style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 0.25rem; font-size: 1rem;"
+            class="newsletter-input"
           />
-          <input
+          </div>
+          <div class="newsletter-field">
+            <label class="newsletter-label" for="newsletter-name">First name (optional)</label>
+            <input
             type="text"
             name="name"
+            id="newsletter-name"
             placeholder="First name (optional)"
             autocomplete="given-name"
-            style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 0.25rem; font-size: 1rem;"
+            class="newsletter-input"
           />
+          </div>
           <input type="hidden" name="source" value="newsletter-page" />
-          <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true" />
-          <button
-            type="submit"
-            style="padding: 0.75rem; background: #0066cc; color: white; border: none; border-radius: 0.25rem; font-weight: 600; cursor: pointer;"
-          >
+          <input type="text" name="website" tabindex="-1" autocomplete="off" class="newsletter-honeypot" aria-hidden="true" />
+          <button type="submit" class="newsletter-submit">
             Subscribe
           </button>
         </form>
       </div>
 
-      <p style="margin-top: 2rem; font-size: 0.9rem; color: #666;">
+      <p class="newsletter-footnote">
         No spam. Unsubscribe anytime. Read by 600+ productivity enthusiasts.
       </p>
     </section>
@@ -94,3 +99,146 @@ const status = Astro.url.searchParams.get('status');
   </footer>
 </body>
 </html>
+
+<style>
+  .newsletter-hero {
+    padding-bottom: 3.5rem;
+  }
+
+  .newsletter-status {
+    margin-top: 1rem;
+    font-weight: 600;
+  }
+
+  .newsletter-status--success {
+    color: #166534;
+  }
+
+  .newsletter-status--info {
+    color: var(--color-text-medium);
+  }
+
+  .newsletter-status--error {
+    color: #b42318;
+  }
+
+  .newsletter-section {
+    max-width: 520px;
+    margin: 3rem auto 4rem;
+    text-align: center;
+  }
+
+  .newsletter-lede {
+    margin-bottom: 2.25rem;
+    color: var(--color-text-medium);
+  }
+
+  .newsletter-card {
+    padding: 2.25rem;
+    background: var(--color-bg-light);
+    border: 1px solid var(--color-border-light);
+    border-radius: 0.75rem;
+    box-shadow: 0 20px 40px rgba(23, 28, 38, 0.08);
+  }
+
+  .newsletter-card h3 {
+    margin-top: 0;
+  }
+
+  .newsletter-subcopy {
+    font-size: 0.95rem;
+    color: var(--color-text-light);
+    margin: 1rem 0 0;
+  }
+
+  .newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.75rem;
+    text-align: left;
+  }
+
+  .newsletter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .newsletter-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-medium);
+  }
+
+  .newsletter-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-family: inherit;
+  }
+
+  .newsletter-input::placeholder {
+    color: var(--color-text-light);
+  }
+
+  .newsletter-input:focus {
+    outline: none;
+    border-color: var(--color-text);
+    box-shadow: 0 0 0 3px rgba(23, 28, 38, 0.1);
+  }
+
+  .newsletter-honeypot {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .newsletter-submit {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.85rem 1.5rem;
+    background: var(--color-accent);
+    color: var(--color-text);
+    border-radius: 0.5rem;
+    border: 2px solid transparent;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .newsletter-submit:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(229, 252, 129, 0.35);
+  }
+
+  .newsletter-submit:focus-visible {
+    outline: 2px solid var(--color-text);
+    outline-offset: 2px;
+  }
+
+  .newsletter-footnote {
+    margin-top: 2.5rem;
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+  }
+
+  @media (max-width: 540px) {
+    .newsletter-card {
+      padding: 1.75rem;
+    }
+
+    .newsletter-form {
+      gap: 0.85rem;
+    }
+  }
+</style>
