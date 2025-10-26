@@ -1,0 +1,339 @@
+---
+export interface Props {
+  placeholder?: string;
+  inline?: boolean;
+}
+
+const { placeholder = "Search posts...", inline = false } = Astro.props;
+---
+
+<div class={`search-container ${inline ? 'search-inline' : ''}`}>
+  <div class="search-wrapper">
+    <input
+      type="text"
+      id="search-input"
+      placeholder={placeholder}
+      class="search-input"
+      autocomplete="off"
+    />
+    <div id="search-results" class="search-results hidden"></div>
+    <div id="search-loading" class="search-loading hidden">Searching...</div>
+  </div>
+</div>
+
+<script>
+  import Fuse from 'fuse.js';
+
+  // Global search state
+  let searchIndex = null;
+  let fuse = null;
+  let isLoading = false;
+
+  // Initialize search when DOM is ready
+  document.addEventListener('DOMContentLoaded', async () => {
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+    const searchResults = document.getElementById('search-results');
+    const searchLoading = document.getElementById('search-loading');
+
+    if (!searchInput || !searchResults || !searchLoading) return;
+
+    // Load search index on first interaction
+    searchInput.addEventListener('focus', async () => {
+      if (!searchIndex && !isLoading) {
+        isLoading = true;
+        searchLoading.classList.remove('hidden');
+
+        try {
+          const response = await fetch('/api/search-index.json');
+          searchIndex = await response.json();
+
+          // Configure Fuse.js for comprehensive search
+          fuse = new Fuse(searchIndex, {
+            keys: [
+              { name: 'title', weight: 0.3 },
+              { name: 'description', weight: 0.2 },
+              { name: 'content', weight: 0.4 },
+              { name: 'tags', weight: 0.1 }
+            ],
+            threshold: 0.3, // Lower = stricter matching
+            includeScore: true,
+            includeMatches: true,
+            minMatchCharLength: 3,
+            shouldSort: true,
+            findAllMatches: true,
+            ignoreLocation: true, // Search entire content
+            useExtendedSearch: true,
+            distance: 100000 // Search full document
+          });
+
+          isLoading = false;
+          searchLoading.classList.add('hidden');
+
+          // Perform search if input has value
+          if (searchInput.value.trim()) {
+            performSearch(searchInput.value);
+          }
+        } catch (error) {
+          console.error('Failed to load search index:', error);
+          isLoading = false;
+          searchLoading.classList.add('hidden');
+        }
+      }
+    }, { once: true });
+
+    // Handle search input
+    let debounceTimer: ReturnType<typeof setTimeout>;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer);
+      const query = (e.target as HTMLInputElement).value.trim();
+
+      if (query.length === 0) {
+        searchResults.classList.add('hidden');
+        searchResults.innerHTML = '';
+        return;
+      }
+
+      if (query.length < 2) return;
+
+      debounceTimer = setTimeout(() => {
+        if (fuse) {
+          performSearch(query);
+        }
+      }, 150); // Fast debounce for instant feel
+    });
+
+    // Perform search
+    function performSearch(query: string) {
+      if (!fuse) return;
+
+      const results = fuse.search(query).slice(0, 10);
+
+      if (results.length === 0) {
+        searchResults.innerHTML = `
+          <div class="search-no-results">
+            No results found for "<strong>${escapeHtml(query)}</strong>"
+          </div>
+        `;
+        searchResults.classList.remove('hidden');
+        return;
+      }
+
+      const html = results.map((result) => {
+        const item = result.item;
+        const snippet = getSnippet(item.content, query, 150);
+
+        return `
+          <a href="/blog/${item.slug}" class="search-result-item">
+            <div class="search-result-title">${highlightMatch(item.title, query)}</div>
+            <div class="search-result-snippet">${snippet}</div>
+            <div class="search-result-meta">
+              ${new Date(item.pubDate).toLocaleDateString()} • ${item.author}
+              ${item.tags.length > 0 ? ` • ${item.tags.slice(0, 3).join(', ')}` : ''}
+            </div>
+          </a>
+        `;
+      }).join('');
+
+      searchResults.innerHTML = html;
+      searchResults.classList.remove('hidden');
+    }
+
+    // Get context snippet with match highlighting
+    function getSnippet(content: string, query: string, maxLength: number): string {
+      const lowerContent = content.toLowerCase();
+      const lowerQuery = query.toLowerCase();
+      const index = lowerContent.indexOf(lowerQuery);
+
+      if (index === -1) {
+        return content.substring(0, maxLength) + '...';
+      }
+
+      // Show context around the match
+      const start = Math.max(0, index - 50);
+      const end = Math.min(content.length, index + query.length + 100);
+      let snippet = content.substring(start, end);
+
+      // Add ellipsis
+      if (start > 0) snippet = '...' + snippet;
+      if (end < content.length) snippet = snippet + '...';
+
+      // Highlight the match
+      return highlightMatch(snippet, query);
+    }
+
+    // Highlight matching text
+    function highlightMatch(text: string, query: string): string {
+      const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+      return text.replace(regex, '<mark>$1</mark>');
+    }
+
+    // Escape HTML
+    function escapeHtml(text: string): string {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Escape regex
+    function escapeRegex(text: string): string {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    // Close results when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target as Node) && !searchResults.contains(e.target as Node)) {
+        searchResults.classList.add('hidden');
+      }
+    });
+
+    // Keep results open when clicking input
+    searchInput.addEventListener('click', () => {
+      if (searchInput.value.trim() && searchResults.innerHTML) {
+        searchResults.classList.remove('hidden');
+      }
+    });
+  });
+</script>
+
+<style>
+  .search-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .search-inline {
+    max-width: 300px;
+    margin: 0;
+  }
+
+  .search-wrapper {
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 15px;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #171c26; /* Match blog text color */
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .search-input::placeholder {
+    color: #6b7280; /* Subtle gray */
+    font-size: 14px;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #171c26;
+    background-color: #ffffff;
+  }
+
+  .search-results {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    max-height: 420px;
+    overflow-y: auto;
+    z-index: 1000;
+  }
+
+  .search-results.hidden {
+    display: none;
+  }
+
+  .search-loading.hidden {
+    display: none;
+  }
+
+  .search-result-item {
+    display: block;
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    text-decoration: none;
+    color: #171c26;
+    transition: background-color 0.15s ease;
+  }
+
+  .search-result-item:hover {
+    background-color: #f9f9f9;
+  }
+
+  .search-result-item:last-child {
+    border-bottom: none;
+  }
+
+  .search-result-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: #171c26;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+
+  .search-result-snippet {
+    font-size: 13px;
+    color: #5b626b;
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+
+  .search-result-meta {
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Highlight matches */
+  mark {
+    background-color: #e5fc81; /* Use your blog's accent color */
+    color: #171c26;
+    font-weight: 500;
+    padding: 0 2px;
+  }
+
+  /* Simple loading state */
+  .search-loading {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    padding: 12px 14px;
+    background: white;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 13px;
+  }
+
+  .search-no-results {
+    padding: 16px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 13px;
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    .search-results {
+      position: fixed;
+      top: 60px;
+      left: 10px;
+      right: 10px;
+      max-height: calc(100vh - 80px);
+    }
+  }
+</style>

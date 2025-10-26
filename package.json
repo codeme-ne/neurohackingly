@@ -20,7 +20,10 @@
     "@astrojs/vercel": "^8.2.11",
     "@types/turndown": "^5.0.5",
     "astro": "^5.14.8",
+    "fuse.js": "^7.1.0",
     "gray-matter": "^4.0.3",
+    "remark": "^15.0.1",
+    "strip-markdown": "^6.0.0",
     "turndown": "^7.2.1"
   },
   "devDependencies": {

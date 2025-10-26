@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import SEO from '../../components/SEO.astro';
+import Search from '../../components/Search.astro';
 import '../../styles/global.css';
 
 // Get all blog posts, sorted by date
@@ -31,6 +32,13 @@ const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDa
       <h1>Blog</h1>
       <p>Exploring productivity, AI, and personal growth</p>
     </header>
+
+    <div class="search-section">
+      <Search inline={false} placeholder="Search all blog posts..." />
+      <div class="search-link">
+        <a href="/blog/search">Advanced Search →</a>
+      </div>
+    </div>
 
     <div class="posts-grid">
       {sortedPosts.map((post) => (
@@ -82,5 +90,40 @@ const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDa
   <footer>
     <p>© 2025 Neurohackingly by Lukas Zangerl</p>
   </footer>
+
+  <style>
+    .search-section {
+      max-width: 100%;
+      margin: 2rem 0 3rem;
+      padding: 0 1rem;
+    }
+
+    .search-link {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .search-link a {
+      color: #3182ce;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+
+    .search-link a:hover {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .search-link a {
+        color: #63b3ed;
+      }
+
+      .search-link a:hover {
+        color: #93c5fd;
+      }
+    }
+  </style>
 </body>
 </html>
