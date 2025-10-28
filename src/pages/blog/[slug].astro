@@ -3,9 +3,9 @@ import { getCollection, getEntry } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft && !data.page);
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
   return posts.map((post) => ({
-    params: { slug: post.id },
+    params: { slug: post.slug },
     props: { post },
   }));
 }
@@ -18,7 +18,7 @@ if (!post) {
   // SSR mode - fetch the post based on slug
   post = await getEntry('blog', slug as string);
 
-  if (!post || post.data.draft || post.data.page) {
+  if (!post || post.data.draft) {
     return Astro.redirect('/404');
   }
 }
