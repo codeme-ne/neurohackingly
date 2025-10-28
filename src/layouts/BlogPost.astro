@@ -14,7 +14,6 @@ interface Props {
   image?: { url: string; alt: string };
   hero?: ImageMetadata;
   tags?: string[];
-  page?: boolean;
   readingTime?: number;
   topics?: string[];
 }
@@ -28,7 +27,6 @@ const {
   image,
   hero,
   tags = [],
-  page: isPage = false,
   readingTime: frontmatterReadingTime,
   topics = []
 } = Astro.props;
@@ -36,7 +34,7 @@ const {
 const pubDate = rawPubDate instanceof Date ? rawPubDate : undefined;
 const updatedDate = rawUpdatedDate instanceof Date ? rawUpdatedDate : undefined;
 
-if (!isPage && !pubDate) {
+if (!pubDate) {
   throw new Error('BlogPost layout requires a pubDate for blog content.');
 }
 
@@ -67,7 +65,7 @@ const authorSameAs = Array.from(new Set([
 ].filter(Boolean)));
 
 const mergedTags = Array.from(new Set([...tags, ...topics]));
-const baseCategory = topics[0] ?? tags[0] ?? (isPage ? 'page' : 'blog');
+const baseCategory = topics[0] ?? tags[0] ?? 'blog';
 const primaryTopic = baseCategory.toLowerCase();
 const timeRequired = `PT${Math.max(1, readingMinutes)}M`;
 
@@ -76,7 +74,7 @@ const effectiveModifiedDate = updatedDate ?? pubDate;
 
 const schema = {
   '@context': 'https://schema.org',
-  '@type': isPage ? 'WebPage' : 'BlogPosting',
+  '@type': 'BlogPosting',
   headline: title,
   description,
   image: image?.url,
@@ -92,7 +90,7 @@ const schema = {
       name: topic
     }))
   }),
-  ...(!isPage && primaryTopic && { articleSection: primaryTopic }),
+  ...(primaryTopic && { articleSection: primaryTopic }),
   author: {
     '@type': 'Person',
     name: author,
@@ -118,7 +116,7 @@ const schema = {
     description={description}
     image={image?.url}
     imageAlt={image?.alt}
-    article={!isPage}
+    article={true}
     publishedTime={pubDate}
     modifiedTime={updatedDate}
     tags={mergedTags}
@@ -149,18 +147,16 @@ const schema = {
           <img src={image.url} alt={image.alt} class="feature-image" loading="lazy" decoding="async" />
         )}
         <h1>{title}</h1>
-        {!isPage && (
-          <div class="meta">
-            <time datetime={pubDate.toISOString()}>
-              {pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </time>
-            <span>·</span>
-            <span>{readingMinutes} min read</span>
-            <span>·</span>
-            <span>{author}</span>
-          </div>
-        )}
-        {!isPage && tags.length > 0 && (
+        <div class="meta">
+          <time datetime={pubDate.toISOString()}>
+            {pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </time>
+          <span>·</span>
+          <span>{readingMinutes} min read</span>
+          <span>·</span>
+          <span>{author}</span>
+        </div>
+        {tags.length > 0 && (
           <div class="tags">
             {tags
               .filter(t => !t.toLowerCase().startsWith('hash-'))
