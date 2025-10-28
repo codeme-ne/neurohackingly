@@ -1,8 +1,16 @@
 ---
 import SEO from '../components/SEO.astro';
 import ScrollProgress from '../components/ScrollProgress.astro';
-import Nav from '../components/Nav.astro';
+import MinimalNav from '../components/MinimalNav.astro';
+import { getCollection } from 'astro:content';
+import PostListTable from '../components/PostListTable.astro';
 import '../styles/global.css';
+
+// Fetch all non-draft posts, sorted by date descending
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const sortedPosts = allPosts.sort((a, b) =>
+  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
 ---
 
 <!DOCTYPE html>
@@ -16,7 +24,7 @@ import '../styles/global.css';
 </head>
 <body>
   <ScrollProgress />
-  <Nav />
+  <MinimalNav />
 
   <main>
     <header class="hero">
@@ -42,6 +50,10 @@ import '../styles/global.css';
         <div class="signup-feedback" aria-live="polite" role="status"></div>
       </div>
     </header>
+
+    <section class="posts-section">
+      <PostListTable posts={sortedPosts} />
+    </section>
 
   </main>
 
@@ -162,6 +174,11 @@ import '../styles/global.css';
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
+  }
+
+  .posts-section {
+    margin-top: 4rem;
+    margin-bottom: 4rem;
   }
 
   @media (max-width: 809px) {
