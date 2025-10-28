@@ -19,35 +19,27 @@ import '../styles/global.css';
   <Nav />
 
   <main>
-    <header class="hero hero--split">
+    <header class="hero">
       <div class="hero-inner">
-        <div class="hero-copy">
-          <h1>Neurohackingly</h1>
-          <p class="tagline">Upgrade your brain, mind, and body</p>
-          <p class="subtitle">Practical strategies for productivity, AI, and personal growth</p>
+        <h1>Neurohackingly</h1>
+        <p class="tagline">Upgrade your brain, mind, and body</p>
+        <p class="subtitle">Practical strategies for productivity, AI, and personal growth</p>
 
-          <form class="signup" action="/api/subscribe" method="post" aria-label="Join the newsletter" novalidate>
-            <label class="sr-only" for="hero-email">Email address</label>
-            <input id="hero-email" name="email" type="email" placeholder="Email address" autocomplete="email" required />
-            <input type="hidden" name="source" value="home-hero" />
-            <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true" />
-            <button class="cta" type="submit">Subscribe</button>
-          </form>
-          <div class="signup-feedback" aria-live="polite" role="status"></div>
+        <div class="social-icons">
+          <a href="https://x.com/neurohackingly" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">X</a>
+          <a href="https://linkedin.com/in/lukzan" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">LinkedIn</a>
+          <a href="https://github.com/codeme-ne" target="_blank" rel="noopener noreferrer" aria-label="GitHub">GitHub</a>
+          <a href="/rss.xml" aria-label="RSS Feed">RSS</a>
         </div>
 
-        <div class="hero-media" aria-label="Featured video">
-          <div class="video-wrapper">
-            <iframe
-              src="https://www.youtube-nocookie.com/embed/lmrUcdGyguA?rel=0"
-              title="YouTube video"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen
-              loading="lazy"
-            ></iframe>
-          </div>
-        </div>
+        <form class="signup" action="/api/subscribe" method="post" aria-label="Join the newsletter" novalidate>
+          <label class="sr-only" for="hero-email">Email address</label>
+          <input id="hero-email" name="email" type="email" placeholder="Email address" autocomplete="email" required />
+          <input type="hidden" name="source" value="home-hero" />
+          <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true" />
+          <button class="cta" type="submit">Subscribe</button>
+        </form>
+        <div class="signup-feedback" aria-live="polite" role="status"></div>
       </div>
     </header>
 
@@ -65,10 +57,9 @@ import '../styles/global.css';
 </html>
 
 <style>
-  /* Ali Abdaal-like hero: left copy + right video */
   .hero {
-    text-align: left;
-    padding: 3rem 0 4rem;
+    text-align: center;
+    padding: 4rem 0 2rem;
   }
 
   .hero h1 {
@@ -96,32 +87,41 @@ import '../styles/global.css';
     line-height: 1.6;
   }
 
-  /* Header layout: copy left, video right on desktop; stacked on mobile */
   .hero-inner {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
-    align-items: center;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .social-icons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin: 1.5rem 0;
+  }
+
+  .social-icons a {
+    color: var(--color-text-light);
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+
+  .social-icons a:hover {
+    color: var(--color-text);
   }
 
   @media (min-width: 900px) {
-    .hero-inner {
-      grid-template-columns: 1.2fr 1fr;
-      gap: 3rem;
-    }
     .hero h1 {
       font-size: 3.5rem;
       letter-spacing: -0.025em;
     }
   }
 
-  /* Inline signup like the theme */
   .signup {
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 0.5rem;
-    margin-top: 2rem;
-    max-width: 540px;
+    margin: 2rem auto 0;
+    max-width: 480px;
   }
 
   .signup input[type="email"] {
@@ -162,23 +162,6 @@ import '../styles/global.css';
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
-  }
-
-  .hero-media .video-wrapper {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    background: #000;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  }
-
-  .hero-media iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
   }
 
   @media (max-width: 809px) {
