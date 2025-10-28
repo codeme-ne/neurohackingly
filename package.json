@@ -10,7 +10,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "validate:home-links": "tsx scripts/validate-home-links.ts"
+    "validate:home-links": "tsx scripts/validate-home-links.ts",
+    "audit:migration": "tsx scripts/pre-migration-audit.ts",
+    "fix:internal-links": "tsx scripts/update-internal-links.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.7",

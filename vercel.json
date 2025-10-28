@@ -1,0 +1,20 @@
+{
+  "redirects": [
+    {
+      "source": "/blog/:slug((?!tag).*)",
+      "destination": "/:slug",
+      "permanent": true,
+      "caseSensitive": false
+    },
+    {
+      "source": "/blog/:slug/(.*)",
+      "destination": "/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/blog/impossiblelist",
+      "destination": "/impossiblelist",
+      "permanent": true
+    }
+  ]
+}

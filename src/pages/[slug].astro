@@ -1,0 +1,54 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import BlogPost from '../layouts/BlogPost.astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const RESERVED_SLUGS = [
+    'now',
+    'newsletter',
+    'rss.xml',
+    'rss',
+    'blog',
+    'sitemap.xml',
+    'robots.txt'
+  ];
+
+  const blogEntries = await getCollection('blog', ({ data }) => !data.draft);
+
+  // Collision detection
+  const collisions = blogEntries.filter(e => RESERVED_SLUGS.includes(e.slug));
+  if (collisions.length > 0) {
+    throw new Error(
+      `Blog slugs collide with reserved routes: ${collisions.map(e => e.slug).join(', ')}`
+    );
+  }
+
+  // Duplicate detection
+  const slugs = new Map<string, string[]>();
+  blogEntries.forEach(e => {
+    if (!slugs.has(e.slug)) slugs.set(e.slug, []);
+    slugs.get(e.slug)!.push(e.id);
+  });
+
+  const duplicates = Array.from(slugs.entries()).filter(([_, ids]) => ids.length > 1);
+  if (duplicates.length > 0) {
+    throw new Error(
+      `Duplicate blog slugs:\n` +
+      duplicates.map(([slug, ids]) => `  "${slug}": ${ids.join(', ')}`).join('\n')
+    );
+  }
+
+  return blogEntries.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry }
+  }));
+};
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<BlogPost {...entry.data}>
+  <Content />
+</BlogPost>

@@ -57,7 +57,7 @@ const postsWithTags = sortedPosts.map((post) => {
         <article class="post-item">
           <div class="post-header">
             <h2>
-              <a href={`/blog/${entry.slug}`}>{entry.data.title}</a>
+              <a href={`/${entry.slug}`}>{entry.data.title}</a>
             </h2>
             <time datetime={entry.data.pubDate.toISOString()}>
               {entry.data.pubDate.toLocaleDateString('en-US', {

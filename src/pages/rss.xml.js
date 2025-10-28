@@ -17,7 +17,12 @@ export async function GET(context) {
       title: post.data.title,
       pubDate: post.data.pubDate,
       description: post.data.description,
-      link: `/blog/${post.id}/`,
+      // NEW: Root URL structure
+      link: `/${post.slug}/`,
+      // STABLE: Keep old URL as GUID to prevent RSS reader duplication
+      guid: `${context.site}blog/${post.slug}/`,
+      // Mark GUID as stable identifier, not a URL
+      isPermaLink: false,
       author: post.data.author,
       categories: post.data.tags,
     })),

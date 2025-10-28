@@ -31,7 +31,7 @@ function formatDate(date: Date): string {
         {formatDate(post.data.pubDate)}
       </time>
       <h2 class="post-title">
-        <a href={`/blog/${post.id.replace('.mdx', '')}`}>
+        <a href={`/${post.slug ?? post.id.replace('.mdx', '')}`}>
           {post.data.title}
         </a>
       </h2>

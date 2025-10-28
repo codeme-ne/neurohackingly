@@ -69,7 +69,7 @@ const filteredPosts = posts
             )}
             <div class="post-content">
               <h2>
-                <a href={`/blog/${post.id}`}>{post.data.title}</a>
+                <a href={`/${post.slug ?? post.id}`}>{post.data.title}</a>
               </h2>
               {post.data.description?.trim() !== post.data.title?.trim() && (
                 <p>{post.data.description}</p>

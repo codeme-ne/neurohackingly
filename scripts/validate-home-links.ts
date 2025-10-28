@@ -25,9 +25,11 @@ function parseArgs(argv: string[]): { base?: string } {
 }
 
 function extractBlogLinksFromHTML(html: string): string[] {
-  // Simple href extractor and filter for "/blog/..." paths
+  // Extract post links (now at root level, excluding static pages)
   const hrefRegex = /<a\b[^>]*href\s*=\s*"([^"]+)"/gi;
   const links = new Set<string>();
+  const STATIC_PAGES = ['/', '/now', '/newsletter', '/blog', '/rss.xml', '/sitemap.xml', '/robots.txt'];
+
   let m: RegExpExecArray | null;
   while ((m = hrefRegex.exec(html))) {
     let href = m[1];
@@ -40,18 +42,23 @@ function extractBlogLinksFromHTML(html: string): string[] {
         href = u.pathname;
       }
     } catch {}
-    // We only care about blog links
-    if (!href.startsWith('/blog/')) continue;
     // Strip query/hash
     href = href.replace(/[?#].*$/, '');
-    links.add(href);
+
+    // Skip static pages and /blog/tag/ paths
+    if (STATIC_PAGES.includes(href) || href.startsWith('/blog/tag/')) continue;
+
+    // Only care about root-level post links (/:slug pattern)
+    if (href.startsWith('/') && !href.startsWith('/blog/') && href.split('/').length === 2) {
+      links.add(href);
+    }
   }
   return Array.from(links);
 }
 
 async function checkViaFiles(distDir: string, urls: string[]): Promise<Result[]> {
   return urls.map((u) => {
-    // Map "/blog/slug" to dist/blog/slug/index.html or dist/blog/slug.html
+    // Map "/:slug" to dist/:slug/index.html or dist/:slug.html
     const rel = u.replace(/^\//, '');
     const indexHtml = path.join(distDir, rel, 'index.html');
     const fileHtml = path.join(distDir, `${rel}.html`);
