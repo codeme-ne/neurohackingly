@@ -1,0 +1,67 @@
+---
+// Minimal navigation component for Cold Takes design
+---
+
+<nav class="minimal-nav">
+  <div class="nav-inner">
+    <a href="/" class="logo">Neurohackingly</a>
+    <div class="nav-links">
+      <a href="/now">Now</a>
+      <a href="/newsletter">Newsletter</a>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .minimal-nav {
+    border-bottom: 1px solid var(--color-border-light, #e5e7eb);
+    padding: 1rem 0;
+    background: var(--color-bg, #fff);
+  }
+
+  .nav-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .logo:hover {
+    opacity: 0.8;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .nav-links a {
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+
+  .nav-links a:hover {
+    color: var(--color-accent);
+  }
+
+  @media (max-width: 640px) {
+    .nav-links {
+      gap: 1rem;
+    }
+
+    .nav-links a {
+      font-size: 0.9rem;
+    }
+  }
+</style>
