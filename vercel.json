@@ -3,8 +3,7 @@
     {
       "source": "/blog/:slug((?!tag).*)",
       "destination": "/:slug",
-      "permanent": true,
-      "caseSensitive": false
+      "permanent": true
     },
     {
       "source": "/blog/:slug/(.*)",
