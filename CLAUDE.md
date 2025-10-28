@@ -37,6 +37,8 @@ src/
     BlogPost.astro   # Post wrapper: SEO, hero/image, meta, reading time
   components/
     SEO.astro        # Open Graph/Twitter/Article tags
+    MinimalNav.astro # Simple header navigation for Cold Takes design
+    PostListTable.astro # Chronological post list component
     Video.astro, GifVideo.astro
   styles/
     global.css       # Site styles
@@ -85,10 +87,24 @@ Content here…
 
 - List: `src/pages/blog/index.astro` enumerates non-draft posts and renders cards.
 - Detail: `src/pages/blog/[slug].astro` uses `getStaticPaths()` with `post.id`.
-- Home: `src/pages/index.astro` shows recent posts and any featured content.
+- Home: `src/pages/index.astro` shows chronological post list with Cold Takes-inspired minimal design.
 - Newsletter landing: `src/pages/newsletter.astro` (placeholder form).
+- Now page: `src/pages/now.astro` (moved from /blog/now to /now root level).
 
 Note on German content: `src/content/de/` exists, but there are no routes for it yet. If you add German MDX files, create `src/pages/de/index.astro` and `src/pages/de/[slug].astro` or adapt the existing blog routes to be locale‑aware.
+
+### New Components (Cold Takes Redesign)
+
+- `MinimalNav.astro` - Simple header navigation with logo and links
+  - Displays site logo ("Neurohackingly") and navigation links (Now, Newsletter)
+  - Centered layout with max-width constraint
+  - Minimal styling matching Cold Takes aesthetic
+
+- `PostListTable.astro` - Chronological post list (date | title | read time)
+  - Props: `posts: CollectionEntry<'blog'>[]`
+  - Auto-calculates reading time from word count (200 wpm)
+  - Responsive: 3-col desktop, 2-col tablet, stacked mobile
+  - Displays post date (formatted as "Oct 28"), title, and reading time
 
 ## SEO and metadata
 
