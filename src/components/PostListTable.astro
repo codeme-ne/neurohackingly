@@ -1,0 +1,134 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  posts: CollectionEntry<'blog'>[];
+}
+
+const { posts } = Astro.props;
+
+// Calculate reading time (words / 200 wpm)
+function calculateReadTime(body: string): string {
+  const words = body.split(/\s+/).length;
+  const minutes = Math.ceil(words / 200);
+  return `${minutes} min read`;
+}
+
+// Format date as "Oct 28"
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: '2-digit'
+  }).format(date);
+}
+---
+
+<div class="post-list">
+  {posts.map((post) => (
+    <article class="post-item">
+      <time class="post-date" datetime={post.data.pubDate.toISOString()}>
+        {formatDate(post.data.pubDate)}
+      </time>
+      <h2 class="post-title">
+        <a href={`/blog/${post.id.replace('.mdx', '')}`}>
+          {post.data.title}
+        </a>
+      </h2>
+      <span class="post-read-time">{calculateReadTime(post.body)}</span>
+    </article>
+  ))}
+</div>
+
+<style>
+  .post-list {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .post-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-border-light, #e5e7eb);
+  }
+
+  .post-item:first-child {
+    border-top: 1px solid var(--color-border-light, #e5e7eb);
+  }
+
+  .post-date {
+    font-size: 0.875rem;
+    color: var(--color-text-light, #6b7280);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .post-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .post-title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .post-title a:hover {
+    color: var(--color-accent);
+  }
+
+  .post-read-time {
+    font-size: 0.875rem;
+    color: var(--color-text-light, #6b7280);
+    white-space: nowrap;
+  }
+
+  /* Mobile: stack into cards */
+  @media (max-width: 640px) {
+    .post-item {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+      padding: 1.25rem 0;
+    }
+
+    .post-date {
+      order: 1;
+    }
+
+    .post-title {
+      order: 2;
+      font-size: 1.05rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .post-read-time {
+      order: 3;
+    }
+  }
+
+  /* Tablet: 2-column layout */
+  @media (min-width: 641px) and (max-width: 900px) {
+    .post-item {
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+    }
+
+    .post-date {
+      grid-column: 1 / -1;
+      margin-bottom: 0.25rem;
+    }
+
+    .post-title {
+      grid-column: 1;
+    }
+
+    .post-read-time {
+      grid-column: 2;
+      text-align: right;
+    }
+  }
+</style>
