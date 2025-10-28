@@ -1,0 +1,188 @@
+---
+interface Props {
+  source?: string;
+  action?: string;
+  id?: string;
+  placeholder?: string;
+  buttonText?: string;
+  ariaLabel?: string;
+}
+
+const {
+  source = 'home-hero',
+  action = '/api/subscribe',
+  id = 'newsletter-email',
+  placeholder = 'Email address',
+  buttonText = 'Subscribe',
+  ariaLabel = 'Join the newsletter'
+}: Props = Astro.props;
+---
+
+<div class="newsletter-signup">
+  <form class="signup" action={action} method="post" aria-label={ariaLabel} novalidate>
+    <label class="sr-only" for={id}>Email address</label>
+    <input id={id} name="email" type="email" placeholder={placeholder} autocomplete="email" required inputmode="email" />
+    <input type="hidden" name="source" value={source} />
+    <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true" />
+    <button class="cta" type="submit">{buttonText}</button>
+  </form>
+  <div class="signup-feedback" aria-live="polite" role="status"></div>
+  
+  <style>
+    .signup {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.5rem;
+      margin: 2rem auto 0;
+      max-width: 480px;
+    }
+
+    .signup input[type="email"] {
+      font: inherit;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--color-border-light);
+      border-radius: 0.375rem;
+      background: var(--color-bg, #fff);
+      color: inherit;
+      width: 100%;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .signup input[type="email"]:hover {
+      border-color: var(--color-border);
+    }
+
+    .signup input[type="email"]:focus {
+      outline: 2px solid var(--color-text);
+      outline-offset: 2px;
+      border-color: var(--color-text);
+    }
+
+    .signup .cta {
+      margin: 0;
+      white-space: nowrap;
+      padding: 0.85rem 1.5rem;
+      font-size: 1rem;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .signup-feedback {
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+    .signup-feedback.success {
+      color: var(--color-text);
+      background: var(--color-accent);
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+    }
+    .signup-feedback.error {
+      color: #b00020;
+      background: #fef2f2;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+    }
+    .signup[aria-busy="true"] .cta {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    @media (max-width: 640px) {
+      .signup {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+    }
+  </style>
+
+  <script is:inline>
+    // Attach behavior scoped to each instance
+    (function attachNewsletterHandlers() {
+      const containers = document.querySelectorAll('.newsletter-signup');
+      containers.forEach((container) => {
+        const form = container.querySelector('form.signup');
+        const emailInput = container.querySelector('input[type="email"]');
+        const feedback = container.querySelector('.signup-feedback');
+        if (!form || !emailInput || !feedback) return;
+
+        const setMessage = (text, type = 'info') => {
+          feedback.textContent = text;
+          feedback.classList.remove('success', 'error', 'info');
+          feedback.classList.add(type);
+        };
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const submitBtn = form.querySelector('button[type="submit"]');
+          if (submitBtn) submitBtn.setAttribute('disabled', 'true');
+          form.setAttribute('aria-busy', 'true');
+          setMessage('Subscribing…', 'info');
+
+          try {
+            const fd = new FormData(form);
+            const res = await fetch(form.action, {
+              method: 'POST',
+              body: fd,
+              headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'fetch'
+              }
+            });
+
+            let status = 'error';
+            let data = null;
+            if (res.ok) {
+              const ct = res.headers.get('content-type') || '';
+              if (ct.includes('application/json')) {
+                data = await res.json();
+                // @ts-ignore
+                status = (data && data.status) || 'error';
+              } else {
+                status = 'success';
+              }
+            }
+
+            if (status === 'success' || status === 'already') {
+              setMessage(
+                status === 'success'
+                  ? 'Thanks! Check your inbox to confirm.'
+                  : 'You are already subscribed.'
+              );
+              feedback.classList.add('success');
+              // @ts-ignore
+              emailInput.value = '';
+            } else {
+              const host = location.hostname;
+              const isLocal = host === 'localhost' || host === '127.0.0.1';
+              // @ts-ignore
+              const detail = data && data.error ? ` (${String(data.error).slice(0, 140)})` : '';
+              setMessage(
+                isLocal ? `Something went wrong${detail}.` : 'Something went wrong. Please try again.',
+                'error'
+              );
+            }
+          } catch (err) {
+            setMessage('Network error. Please try again.', 'error');
+          } finally {
+            if (submitBtn) submitBtn.removeAttribute('disabled');
+            form.removeAttribute('aria-busy');
+          }
+        });
+      });
+    })();
+  </script>
+</div>
+

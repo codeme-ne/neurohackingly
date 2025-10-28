@@ -16,6 +16,7 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.env.local
 
 # macOS-specific files
 .DS_Store
@@ -27,3 +28,14 @@ ghost-import.zip
 
 # worktrees
 .worktrees/
+
+# prevent nested repo accidents
+blog/
+
+.claude/
+.codex/
+
+
+
+
+

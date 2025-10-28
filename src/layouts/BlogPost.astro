@@ -8,7 +8,7 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description: string;
-  pubDate?: Date;
+  pubDate: Date;
   updatedDate?: Date;
   author: string;
   image?: { url: string; alt: string };
@@ -31,8 +31,9 @@ const {
   topics = []
 } = Astro.props;
 
-const pubDate = rawPubDate instanceof Date ? rawPubDate : undefined;
-const updatedDate = rawUpdatedDate instanceof Date ? rawUpdatedDate : undefined;
+// Trust Zod schema - dates are already validated
+const pubDate = rawPubDate;
+const updatedDate = rawUpdatedDate;
 
 if (!pubDate) {
   throw new Error('BlogPost layout requires a pubDate for blog content.');
@@ -54,7 +55,7 @@ const authorSocials = {
   twitter: '@neurohackingly',
   linkedin: 'https://www.linkedin.com/in/lukzan',
   github: 'https://github.com/codeme-ne',
-  website: 'https://neurohackingly.com/about'
+  website: 'https://neurohackingly.com'
 };
 
 const authorSameAs = Array.from(new Set([
@@ -138,7 +139,6 @@ const schema = {
             alt={image?.alt ?? ''}
             widths={[720, 1024, 1440]}
             sizes="(max-width: 720px) 100vw, 720px"
-            formats={['avif', 'webp', 'jpeg']}
             class="feature-image"
             loading="lazy"
             decoding="async"

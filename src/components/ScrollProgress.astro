@@ -41,7 +41,7 @@
   if (typeof window !== 'undefined') {
     const bar = document.querySelector('[data-scroll-progress] .scroll-progress__bar');
 
-    if (bar) {
+    if (bar instanceof HTMLElement) {
       const update = () => {
         const max = document.documentElement.scrollHeight - window.innerHeight;
         const percent = max > 0 ? window.scrollY / max : 0;

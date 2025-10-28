@@ -14,11 +14,12 @@ function calculateReadTime(body: string): string {
   return `${minutes} min read`;
 }
 
-// Format date as "Oct 28"
+// Format date as "Oct 28, 2025"
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
-    day: '2-digit'
+    day: '2-digit',
+    year: 'numeric'
   }).format(date);
 }
 ---
@@ -48,7 +49,7 @@ function formatDate(date: Date): string {
 
   .post-item {
     display: grid;
-    grid-template-columns: 80px 1fr auto;
+    grid-template-columns: 110px 1fr auto;
     gap: 1rem;
     align-items: baseline;
     padding: 1rem 0;

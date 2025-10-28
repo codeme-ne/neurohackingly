@@ -1,58 +1,49 @@
 ---
-/**
- * GifVideo Component
- *
- * Specialized wrapper around Video component for GIF replacements.
- * Autoplays, loops, muted - mimics GIF behavior with 80-90% smaller files.
- *
- * Props:
- *   - mp4: string (required) - Path to MP4 file
- *   - webm: string (required) - Path to WebM file
- *   - poster: string (required) - Path to poster JPG
- *   - alt: string (required) - Alt text for accessibility
- *   - width?: number - Explicit width (prevents CLS)
- *   - height?: number - Explicit height (prevents CLS)
- *
- * Example:
- *   <GifVideo
- *     webm="/images/example/animation.webm"
- *     mp4="/images/example/animation.mp4"
- *     poster="/images/example/animation.jpg"
- *     alt="Animated example"
- *   />
- */
-
-import Video from './Video.astro';
-import type { VideoSource } from './Video.astro';
-
-export interface Props {
-  mp4: string;
-  webm: string;
-  poster: string;
-  alt: string;
-  width?: number;
-  height?: number;
+interface Props {
+  webm?: string;
+  mp4?: string;
+  poster?: string;
+  alt?: string;
+  class?: string;
 }
 
-const { mp4, webm, poster, alt, width, height } = Astro.props;
-
-// Convert to Video sources format (prefer WebM for better compression)
-const sources: VideoSource[] = [
-  { src: webm, type: 'video/webm' },
-  { src: mp4, type: 'video/mp4' },
-];
+const { webm, mp4, poster, alt = '', class: className }: Props = Astro.props;
+const hasAnySource = Boolean(webm || mp4);
 ---
 
-<Video
-  sources={sources}
-  poster={poster}
-  alt={alt}
-  width={width}
-  height={height}
-  autoplay
-  loop
-  muted
-  playsinline
-  controls={false}
-  preload="metadata"
-/>
+{hasAnySource ? (
+  <figure class={`gif-video ${className ?? ''}`.trim()}>
+    <video
+      autoplay
+      loop
+      muted
+      playsinline
+      poster={poster}
+      aria-label={alt || undefined}
+    >
+      {webm && <source src={webm} type="video/webm" />}
+      {mp4 && <source src={mp4} type="video/mp4" />}
+    </video>
+    {alt && <figcaption>{alt}</figcaption>}
+  </figure>
+) : null}
+
+<style>
+  .gif-video {
+    margin: 2rem 0;
+  }
+
+  .gif-video video {
+    display: block;
+    width: 100%;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 20px var(--color-overlay, rgba(0, 0, 0, 0.1));
+  }
+
+  .gif-video figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+    text-align: center;
+  }
+</style>

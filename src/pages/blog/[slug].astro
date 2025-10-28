@@ -15,12 +15,20 @@ const { slug } = Astro.params;
 let post = Astro.props.post;
 
 if (!post) {
-  // SSR mode - fetch the post based on slug
-  post = await getEntry('blog', slug as string);
-
-  if (!post || post.data.draft) {
+  if (typeof slug !== 'string') {
     return Astro.redirect('/404');
   }
+
+  const entry = await getEntry('blog', slug);
+  if (!entry || entry.data.draft) {
+    return Astro.redirect('/404');
+  }
+
+  post = entry;
+}
+
+if (!post) {
+  throw new Error(`Post "${slug ?? ''}" not found.`);
 }
 
 const { Content } = await post.render();

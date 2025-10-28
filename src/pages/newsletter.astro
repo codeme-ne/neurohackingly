@@ -1,8 +1,8 @@
 ---
 import SEO from '../components/SEO.astro';
 import ScrollProgress from '../components/ScrollProgress.astro';
-import Nav from '../components/Nav.astro';
 import '../styles/global.css';
+import MinimalNav from '../components/MinimalNav.astro';
 
 const status = Astro.url.searchParams.get('status');
 ---
@@ -18,7 +18,7 @@ const status = Astro.url.searchParams.get('status');
 </head>
 <body>
   <ScrollProgress />
-  <Nav />
+  <MinimalNav />
 
   <main>
     <header class="hero newsletter-hero">
@@ -89,7 +89,7 @@ const status = Astro.url.searchParams.get('status');
       </div>
 
       <p class="newsletter-footnote">
-        No spam. Unsubscribe anytime. Read by 600+ productivity enthusiasts.
+        No spam. Just high quality content.
       </p>
     </section>
   </main>

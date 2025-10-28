@@ -10,9 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "lint:content": "tsx scripts/validate-content.ts",
-    "parse-ghost": "tsx scripts/ghost-parser.ts",
-    "migrate-images": "tsx scripts/migrate-images.ts"
+    "validate:home-links": "tsx scripts/validate-home-links.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.7",
@@ -29,6 +27,8 @@
     "turndown": "^7.2.1"
   },
   "devDependencies": {
-    "tsx": "^4.20.6"
+    "@astrojs/check": "^0.9.5",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
   }
 }
