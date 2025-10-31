@@ -161,7 +161,7 @@ const schema = {
             {tags
               .filter(t => !t.toLowerCase().startsWith('hash-'))
               .map(tag => (
-                <a href={`/blog/tag/${encodeURIComponent(tag)}`} class="tag">#{tag}</a>
+                <a href={`/tag/${encodeURIComponent(tag)}`} class="tag">#{tag}</a>
               ))}
           </div>
         )}
