@@ -45,8 +45,8 @@ function extractBlogLinksFromHTML(html: string): string[] {
     // Strip query/hash
     href = href.replace(/[?#].*$/, '');
 
-    // Skip static pages and /blog/tag/ paths
-    if (STATIC_PAGES.includes(href) || href.startsWith('/blog/tag/')) continue;
+    // Skip static pages and /tag/ paths
+    if (STATIC_PAGES.includes(href) || href.startsWith('/tag/')) continue;
 
     // Only care about root-level post links (/:slug pattern)
     if (href.startsWith('/') && !href.startsWith('/blog/') && href.split('/').length === 2) {
