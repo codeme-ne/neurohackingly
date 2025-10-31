@@ -39,16 +39,27 @@ export const getStaticPaths: GetStaticPaths = async () => {
     );
   }
 
+  // Do not pass the full `entry` via props in server output.
+  // Non-serializable fields (like the `render` function) are stripped,
+  // which causes runtime errors. Only return params here.
   return blogEntries.map(entry => ({
-    params: { slug: entry.slug },
-    props: { entry }
+    params: { slug: entry.slug }
   }));
 };
 
-const { entry } = Astro.props;
-const { Content } = await entry.render();
+// Fetch the entry at runtime to preserve the `render()` method in SSR
+const slug = Astro.params.slug as string;
+const entry = await getEntry('blog', slug);
+
+if (!entry) {
+  Astro.response.status = 404;
+}
+
+const { Content } = entry ? await entry.render() : ({ Content: () => null } as any);
 ---
 
-<BlogPost {...entry.data}>
-  <Content />
-</BlogPost>
+{entry && (
+  <BlogPost {...entry.data}>
+    <Content />
+  </BlogPost>
+)}
