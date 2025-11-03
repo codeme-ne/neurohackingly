@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import SEO from '../components/SEO.astro';
 import ScrollProgress from '../components/ScrollProgress.astro';
 import MinimalNav from '../components/MinimalNav.astro';
+import Footer from '../components/Footer.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -172,9 +173,7 @@ const schema = {
       </div>
     </article>
 
-    <footer>
-      <p>© 2025 Neurohackingly by Lukas Zangerl</p>
-    </footer>
+    <Footer />
   </main>
 </body>
 </html>

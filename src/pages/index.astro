@@ -2,6 +2,7 @@
 import SEO from '../components/SEO.astro';
 import ScrollProgress from '../components/ScrollProgress.astro';
 import MinimalNav from '../components/MinimalNav.astro';
+import Footer from '../components/Footer.astro';
 import { getCollection } from 'astro:content';
 import PostListTable from '../components/PostListTable.astro';
 import NewsletterSignup from '../components/NewsletterSignup.astro';
@@ -34,13 +35,6 @@ const sortedPosts = allPosts.sort((a, b) =>
         <p class="tagline">Upgrade your brain, mind, and body</p>
         <p class="subtitle">Practical strategies for productivity, AI, and personal growth</p>
 
-        <div class="social-icons">
-          <a href="https://x.com/neurohackingly" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">X</a>
-          <a href="https://linkedin.com/in/lukzan" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">LinkedIn</a>
-          <a href="https://github.com/codeme-ne" target="_blank" rel="noopener noreferrer" aria-label="GitHub">GitHub</a>
-          <a href="/rss.xml" aria-label="RSS Feed">RSS</a>
-        </div>
-
         <NewsletterSignup source="home-hero" id="hero-email" ariaLabel="Join the newsletter" />
       </div>
     </header>
@@ -51,9 +45,7 @@ const sortedPosts = allPosts.sort((a, b) =>
 
   </main>
 
-  <footer>
-    <p>© 2025 Neurohackingly by Lukas Zangerl</p>
-  </footer>
+  <Footer />
 </body>
 </html>
 
@@ -61,23 +53,6 @@ const sortedPosts = allPosts.sort((a, b) =>
   .hero-inner {
     max-width: 720px;
     margin: 0 auto;
-  }
-
-  .social-icons {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    margin: 1.5rem 0;
-  }
-
-  .social-icons a {
-    color: var(--color-text-light);
-    text-decoration: none;
-    font-size: 0.9rem;
-  }
-
-  .social-icons a:hover {
-    color: var(--color-text);
   }
 
   .posts-section {
