@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import SEO from '../components/SEO.astro';
 import ScrollProgress from '../components/ScrollProgress.astro';
 import MinimalNav from '../components/MinimalNav.astro';
@@ -70,6 +71,9 @@ const mergedTags = Array.from(new Set([...tags, ...topics]));
 const baseCategory = topics[0] ?? tags[0] ?? 'blog';
 const primaryTopic = baseCategory.toLowerCase();
 const timeRequired = `PT${Math.max(1, readingMinutes)}M`;
+const publisherLogo = Astro.site
+  ? new URL('/images/og/default.svg', Astro.site).href
+  : 'https://neurohackingly.com/images/og/default.svg';
 
 // Schema.org structured data
 const effectiveModifiedDate = updatedDate ?? pubDate;
@@ -104,7 +108,7 @@ const schema = {
     name: 'Neurohackingly',
     logo: {
       '@type': 'ImageObject',
-      url: 'https://neurohackingly.com/logo.png'
+      url: publisherLogo
     }
   }
 };

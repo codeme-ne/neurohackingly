@@ -1,8 +1,16 @@
 {
+  "functions": {
+    "runtime": "nodejs22.x"
+  },
   "redirects": [
     {
       "source": "/blog/:slug((?!tag).*)",
       "destination": "/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/blog/tag/:tag",
+      "destination": "/tag/:tag",
       "permanent": true
     },
     {

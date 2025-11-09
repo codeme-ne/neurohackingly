@@ -138,5 +138,5 @@ const jsonLdEntries = structuredData
 <link rel="alternate" type="application/rss+xml" title="Neurohackingly RSS Feed" href="/rss.xml" />
 
 {jsonLdEntries.map((entry) => (
-  <script type="application/ld+json" set:html={JSON.stringify(entry, null, 2)} />
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(entry, null, 2)} />
 ))}
