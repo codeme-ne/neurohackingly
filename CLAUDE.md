@@ -88,13 +88,11 @@ Content is stored in `src/content/blog/` as MDX files with frontmatter defined b
 ```
 src/pages/
 ├── index.astro              # Homepage with all posts
-├── [slug].astro             # Root-level blog posts (SSR)
+├── [slug].astro             # Root-level blog posts (prerendered)
+├── tag/[tag].astro          # Root-level tag pages (prerendered)
 ├── blog/
 │   ├── index.astro          # Blog archive
-│   ├── [slug].astro         # Individual blog posts
-│   ├── tag/[tag].astro      # Tag-filtered posts
 │   └── impossiblelist.astro # Static page
-├── tag/[tag].astro          # Root-level tag pages
 ├── now.astro                # /now page
 ├── newsletter.astro         # Newsletter signup
 ├── api/
@@ -103,9 +101,11 @@ src/pages/
 ```
 
 **Key routing notes:**
-- `[slug].astro` uses both SSG (`getStaticPaths`) and SSR fallback
+- `[slug].astro` and `tag/[tag].astro` are prerendered at build time for optimal performance
+- Old `/blog/[slug].astro` and `/blog/tag/[tag].astro` routes have been removed to avoid conflicts
+- Vercel edge redirects handle legacy `/blog/*` URLs → root-level URLs (301 permanent)
 - RSS feed uses legacy `/blog/:slug` GUIDs to prevent duplicate entries in feed readers
-- Tag pages dynamically generate based on content collection tags
+- All dynamic routes use `getStaticPaths()` for static generation
 
 ### Components
 
@@ -175,23 +175,23 @@ The RSS feed (`/rss.xml`) maintains backward compatibility:
 
 ## Key Patterns
 
-### Static Site Generation with SSR Fallback
+### Prerendered Dynamic Routes
 
-Blog post pages use hybrid rendering:
+Blog post and tag pages are prerendered at build time for optimal performance:
 
 ```typescript
 export const prerender = true;  // Pre-render at build time
 
 export async function getStaticPaths() {
-  // Generate paths at build time
-}
-
-// In SSR mode, manually fetch if needed
-const { slug } = Astro.params;
-if (!post) {
-  const entry = await getEntry('blog', slug);
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
 }
 ```
+
+While the site uses `output: 'server'` mode, individual pages opt into static generation via `prerender: true`.
 
 ### Content Filtering
 
