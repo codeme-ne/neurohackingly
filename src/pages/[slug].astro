@@ -3,6 +3,8 @@ import { getCollection, getEntry } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import BlogPost from '../layouts/BlogPost.astro';
 
+export const prerender = true;
+
 export const getStaticPaths: GetStaticPaths = async () => {
   const RESERVED_SLUGS = [
     'now',
