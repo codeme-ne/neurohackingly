@@ -23,6 +23,19 @@ const sortedPosts = allPosts.sort((a, b) =>
     description="Practical strategies and insights on productivity, AI, and personal growth by Lukas Zangerl"
     category="home"
   />
+  <script is:inline>
+    const getTheme = () => localStorage.getItem('theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    document.documentElement.setAttribute('data-theme', getTheme());
+
+    window.toggleTheme = () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    };
+  </script>
 </head>
 <body>
   <ScrollProgress />

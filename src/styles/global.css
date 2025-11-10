@@ -19,9 +19,9 @@ html {
   --color-text: #171c26;
   --color-text-medium: #5b626b;
   --color-text-light: #6b7280;
-  --color-accent: #e5fc81;
-  --color-accent-hover: #d4eb70;
-  --color-accent-dark: #c7de5f;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --color-accent-dark: #1d4ed8;
   --color-border: #dbdbdb;
   --color-border-light: #e5e5e5;
   --color-overlay: rgba(23, 28, 38, 0.1);
@@ -33,6 +33,21 @@ html {
 
   /* Layout */
   --max-width: 800px;
+}
+
+/* Dark Theme */
+:root[data-theme="dark"] {
+  --color-bg: #0a0e17;
+  --color-bg-light: #1a1e27;
+  --color-text: #e8eaed;
+  --color-text-medium: #9ca3af;
+  --color-text-light: #6b7280;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --color-accent-dark: #1d4ed8;
+  --color-border: #2d3748;
+  --color-border-light: #1f2937;
+  --color-overlay: rgba(255, 255, 255, 0.1);
 }
 
 body {
@@ -163,7 +178,7 @@ a:focus-visible {
 .cta:hover {
   background: var(--color-accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(229, 252, 129, 0.3);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .cta:active {

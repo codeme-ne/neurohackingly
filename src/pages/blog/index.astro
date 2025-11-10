@@ -41,6 +41,19 @@ const postsWithTags = sortedPosts.map((post) => {
     description="Articles on productivity, AI, and personal growth"
     category="blog"
   />
+  <script is:inline>
+    const getTheme = () => localStorage.getItem('theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    document.documentElement.setAttribute('data-theme', getTheme());
+
+    window.toggleTheme = () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    };
+  </script>
 </head>
 <body>
   <ScrollProgress />

@@ -15,6 +15,19 @@ const status = Astro.url.searchParams.get('status');
     description="Join the Neurohackingly newsletter for weekly insights on productivity, AI, and personal-growth"
     category="newsletter"
   />
+  <script is:inline>
+    const getTheme = () => localStorage.getItem('theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    document.documentElement.setAttribute('data-theme', getTheme());
+
+    window.toggleTheme = () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    };
+  </script>
 </head>
 <body>
   <ScrollProgress />
@@ -218,7 +231,7 @@ const status = Astro.url.searchParams.get('status');
   .newsletter-submit:hover {
     background: var(--color-accent-hover);
     transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(229, 252, 129, 0.35);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35);
   }
 
   .newsletter-submit:focus-visible {
