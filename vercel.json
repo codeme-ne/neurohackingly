@@ -1,6 +1,6 @@
 {
   "functions": {
-    "runtime": "nodejs22.x"
+    "defaultRuntime": "nodejs22.x"
   },
   "redirects": [
     {
