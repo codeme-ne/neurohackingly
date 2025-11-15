@@ -27,6 +27,13 @@ interface Pagefind {
 
 type PagefindResultData = Awaited<ReturnType<PagefindResult['data']>>;
 
+class PagefindAssetError extends Error {
+  constructor(message = 'Pagefind assets missing') {
+    super(message);
+    this.name = 'PagefindAssetError';
+  }
+}
+
 export class SearchModal {
   private modal!: HTMLElement;
   private input!: HTMLInputElement;
@@ -122,7 +129,7 @@ export class SearchModal {
       console.warn(
         'SearchModal: Pagefind script not preloaded. Run "npm run dev:with-search" in development or ensure the Pagefind assets are built for production.'
       );
-      throw new Error('Pagefind assets missing');
+      throw new PagefindAssetError();
     }
 
     try {
@@ -140,7 +147,7 @@ export class SearchModal {
         'SearchModal: Failed to initialize Pagefind from global promise.',
         err
       );
-      throw new Error('Pagefind assets missing');
+      throw new PagefindAssetError();
     }
   }
 
@@ -163,9 +170,10 @@ export class SearchModal {
       this.displayResults(resultsData);
     } catch (error) {
       console.error('Search error:', error);
-      const msg = (error as any)?.message?.includes('Pagefind assets missing')
-        ? 'Search index not found. Run "npm run dev:with-search" to enable search in dev.'
-        : 'Search failed. Please try again.';
+      const msg =
+        error instanceof PagefindAssetError
+          ? 'Search index not found. Run "npm run dev:with-search" to enable search in dev or build the site to generate the index.'
+          : 'Search failed. Please try again.';
       this.results.innerHTML = `<div class="search-error">${msg}</div>`;
     } finally {
       this.loading.style.display = 'none';

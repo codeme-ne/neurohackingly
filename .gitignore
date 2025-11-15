@@ -1,5 +1,6 @@
 # build output
 dist/
+public/pagefind/
 # generated types
 .astro/
 
@@ -36,7 +37,6 @@ blog/
 .codex/
 
 zen-mcp-server/
-
 
 
 
