@@ -37,7 +37,6 @@ const TAG_MAP: TagMapping = {
   'productive-self': ['productivity'],
   'productivitysystem': ['productivity'],
   'productivity-community': ['productivity'],
-  'productivity-newsletter': ['productivity', 'newsletter'],
   'focus': ['productivity'],
   'focus-log-ali-abdaal': ['productivity'],
   'focusmusic': ['productivity'],
@@ -112,6 +111,8 @@ const TAG_MAP: TagMapping = {
   'victor-frankl': ['mindset'],
   philosophy: ['mindset'],
   purpose: ['mindset'],
+  improvement: ['mindset'],
+  thinking: ['mindset'],
 
   // NLP / coaching
   nlp: ['nlp'],
@@ -207,9 +208,9 @@ const TAG_MAP: TagMapping = {
 
   // Newsletter / podcast
   newsletter: ['newsletter'],
-  'coaching-newsletter': ['newsletter'],
-  'peak-performance-newsletter': ['newsletter'],
-  'productivity-newsletter': ['newsletter'],
+  'coaching-newsletter': ['nlp'],
+  'peak-performance-newsletter': ['productivity'],
+  'productivity-newsletter': ['productivity'],
 
   podcast: ['podcast'],
   'podcast-by-derek-sivers': ['podcast'],
@@ -339,6 +340,9 @@ function suggestTagsFromSlug(slug: string): string[] {
   ) {
     add('productivity');
   }
+  if (s.includes('motivat')) {
+    add('mindset');
+  }
   if (s.includes('nlp') || s.includes('hypnosis')) {
     add('nlp');
   }
@@ -366,9 +370,6 @@ function suggestTagsFromSlug(slug: string): string[] {
     s.includes('80-days')
   ) {
     add('self-experiment');
-  }
-  if (s.includes('newsletter') || s.includes('weekly-review') || s.includes('weekly-wins')) {
-    add('newsletter');
   }
   if (s.includes('podcast')) {
     add('podcast');
@@ -416,11 +417,27 @@ function processFile(file: string): TagUpdate {
   const { hashTags, visibleTags } = splitTags(flatTags);
   const { mapped, unmapped } = mapVisibleTags(visibleTags);
 
-  const newVisible = [...mapped, ...unmapped];
-  const newAll = [...hashTags, ...newVisible];
+  let newVisible = [...mapped, ...unmapped];
 
-  const suggestionsForEmpty =
-    visibleTags.length === 0 && newVisible.length === 0 ? suggestTagsFromSlug(slug) : [];
+  const slugSuggestions = suggestTagsFromSlug(slug).filter(
+    (t) => t !== 'newsletter'
+  );
+
+  const onlyFormatTags =
+    visibleTags.length > 0 &&
+    visibleTags.every((t) => t === 'newsletter' || t === 'podcast');
+
+  let suggestionsForEmpty: string[] = [];
+  if (visibleTags.length === 0 && newVisible.length === 0) {
+    suggestionsForEmpty = slugSuggestions;
+  } else if (onlyFormatTags && slugSuggestions.length > 0) {
+    suggestionsForEmpty = slugSuggestions;
+    for (const s of slugSuggestions) {
+      if (!newVisible.includes(s)) newVisible.push(s);
+    }
+  }
+
+  const newAll = [...hashTags, ...newVisible];
 
   const changed = !areArraysEqual(flatTags, newAll);
 
@@ -512,4 +529,3 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-

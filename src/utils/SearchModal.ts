@@ -35,13 +35,13 @@ class PagefindAssetError extends Error {
 }
 
 export class SearchModal {
-  private modal!: HTMLElement;
-  private input!: HTMLInputElement;
-  private results!: HTMLElement;
-  private loading!: HTMLElement;
-  private trigger!: HTMLElement;
-  private closeButton!: HTMLElement;
-  private backdrop!: HTMLElement;
+  private modal: HTMLElement;
+  private input: HTMLInputElement;
+  private results: HTMLElement;
+  private loading: HTMLElement;
+  private trigger: HTMLElement;
+  private closeButton: HTMLElement;
+  private backdrop: HTMLElement;
   private pagefind: Pagefind | null = null;
   private selectedIndex: number = -1;
   private originalBodyOverflow = '';
@@ -55,16 +55,23 @@ export class SearchModal {
 
   constructor() {
     const modal = document.getElementById('search-modal');
-    const input = document.getElementById('search-input') as HTMLInputElement | null;
+    const input = document.getElementById('search-input');
     const results = document.getElementById('search-results');
     const loading = document.getElementById('search-loading');
     const trigger = document.getElementById('search-trigger');
     const closeButton = document.getElementById('search-close');
     const backdrop = document.getElementById('search-backdrop');
 
-    if (!modal || !input || !results || !loading || !trigger || !closeButton || !backdrop) {
-      console.error('SearchModal: Required DOM elements missing');
-      return;
+    if (
+      !(modal instanceof HTMLElement) ||
+      !(input instanceof HTMLInputElement) ||
+      !(results instanceof HTMLElement) ||
+      !(loading instanceof HTMLElement) ||
+      !(trigger instanceof HTMLElement) ||
+      !(closeButton instanceof HTMLElement) ||
+      !(backdrop instanceof HTMLElement)
+    ) {
+      throw new Error('SearchModal: Required DOM elements missing');
     }
 
     this.modal = modal;
@@ -249,11 +256,22 @@ export class SearchModal {
       return;
     }
 
-    this.results.innerHTML = `
-      <div class="search-hint">
-        <kbd>Cmd</kbd>+<kbd>K</kbd> to open • <kbd>Esc</kbd> to close
-      </div>
-    `;
+    this.results.innerHTML = '';
+
+    const hintDiv = document.createElement('div');
+    hintDiv.className = 'search-hint';
+
+    const kbdCmd = document.createElement('kbd');
+    kbdCmd.textContent = 'Cmd';
+
+    const kbdK = document.createElement('kbd');
+    kbdK.textContent = 'K';
+
+    const kbdEsc = document.createElement('kbd');
+    kbdEsc.textContent = 'Esc';
+
+    hintDiv.append(kbdCmd, '+', kbdK, ' to open • ', kbdEsc, ' to close');
+    this.results.appendChild(hintDiv);
   }
 
   private navigateResults(direction: number) {

@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
-import fs from 'node:fs';
+import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -47,24 +47,36 @@ export default defineConfig({
           }
         },
         configureServer(server) {
-          server.middlewares.use((req, res, next) => {
-            if (req.url?.startsWith('/pagefind/')) {
-              const pagefindPath = path.join(__dirname, 'dist', req.url);
-              if (fs.existsSync(pagefindPath)) {
-                const ext = path.extname(pagefindPath);
-                const contentTypes = {
-                  '.js': 'application/javascript',
-                  '.json': 'application/json',
-                  '.css': 'text/css',
-                  '.pf_meta': 'application/octet-stream',
-                  '.pf_index': 'application/octet-stream',
-                  '.pf_fragment': 'application/octet-stream'
-                };
-                res.setHeader('Content-Type', contentTypes[ext] || 'application/octet-stream');
-                res.end(fs.readFileSync(pagefindPath));
-                return;
+          server.middlewares.use(async (req, res, next) => {
+            if (!req.url?.startsWith('/pagefind/')) {
+              next();
+              return;
+            }
+
+            const pagefindPath = path.join(__dirname, 'dist', req.url);
+            const contentTypes = {
+              '.js': 'application/javascript',
+              '.json': 'application/json',
+              '.css': 'text/css',
+              '.pf_meta': 'application/octet-stream',
+              '.pf_index': 'application/octet-stream',
+              '.pf_fragment': 'application/octet-stream'
+            };
+
+            try {
+              await fs.access(pagefindPath);
+              res.setHeader('Content-Type', contentTypes[path.extname(pagefindPath)] || 'application/octet-stream');
+              const fileContents = await fs.readFile(pagefindPath);
+              res.end(fileContents);
+              return;
+            } catch (error) {
+              const isNotFound =
+                typeof error === 'object' && error !== null && 'code' in error && error.code === 'ENOENT';
+              if (!isNotFound) {
+                console.warn(`pagefind-dev-server: unable to serve ${pagefindPath}`, error);
               }
             }
+
             next();
           });
         }
