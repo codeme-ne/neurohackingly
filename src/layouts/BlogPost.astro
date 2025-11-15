@@ -158,11 +158,11 @@ const schema = {
             widths={[720, 1024, 1440]}
             sizes="(max-width: 720px) 100vw, 720px"
             class="feature-image"
-            loading="lazy"
+            loading="eager"
             decoding="async"
           />
         ) : image && (
-          <img src={image.url} alt={image.alt} class="feature-image" loading="lazy" decoding="async" />
+          <img src={image.url} alt={image.alt} class="feature-image" loading="eager" decoding="async" />
         )}
         <h1 data-pagefind-meta="title">{title}</h1>
         <div class="meta" data-pagefind-meta="date[content]" content={pubDate.toISOString()}>

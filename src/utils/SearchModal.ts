@@ -118,33 +118,22 @@ export class SearchModal {
       return this.pagefind;
     }
 
-    if (typeof window === 'undefined') {
-      throw new Error('Pagefind is only available in the browser');
-    }
-
-    const anyWindow = window as any;
-    const pagefindPromise: Promise<Pagefind> | undefined = anyWindow.__pagefindPromise;
-
-    if (!pagefindPromise) {
-      console.warn(
-        'SearchModal: Pagefind script not preloaded. Run "npm run dev:with-search" in development or ensure the Pagefind assets are built for production.'
-      );
-      throw new PagefindAssetError();
-    }
+    const specifier = '/pagefind/pagefind.js';
 
     try {
-      const mod = await pagefindPromise;
+      // Avoid Vite trying to resolve at build time; load at runtime only
+      const mod = (await import(/* @vite-ignore */ specifier)) as Pagefind;
       await mod.options({
         ranking: {
           pageLength: 0.5,
           termFrequency: 1.0
         }
       });
-      this.pagefind = mod;
+      this.pagefind = mod as Pagefind;
       return this.pagefind;
     } catch (err) {
       console.warn(
-        'SearchModal: Failed to initialize Pagefind from global promise.',
+        'SearchModal: Failed to load Pagefind from /pagefind/pagefind.js. Run "npm run dev:with-search" in development or ensure the Pagefind assets are built for production.',
         err
       );
       throw new PagefindAssetError();

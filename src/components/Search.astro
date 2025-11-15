@@ -54,20 +54,6 @@
   </span>
 </button>
 
-<script is:inline type="module">
-  if (typeof window !== 'undefined') {
-    // Preload Pagefind from the static /pagefind assets when available.
-    // This import runs purely in the browser and is not processed by Vite.
-    window.__pagefindPromise ??= import('/pagefind/pagefind.js').catch((err) => {
-      console.warn(
-        'Search: Failed to load /pagefind/pagefind.js. Run "npm run dev:with-search" in development or ensure Pagefind is built in production.',
-        err
-      );
-      throw err;
-    });
-  }
-</script>
-
 <script>
   import { SearchModal } from '../utils/SearchModal';
 

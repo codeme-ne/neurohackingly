@@ -16,7 +16,9 @@
     "upgrade:astro": "npx -y @astrojs/upgrade --yes && npm install",
     "validate:home-links": "tsx scripts/validate-home-links.ts",
     "audit:migration": "tsx scripts/pre-migration-audit.ts",
-    "fix:internal-links": "tsx scripts/update-internal-links.ts"
+    "fix:internal-links": "tsx scripts/update-internal-links.ts",
+    "audit:tags": "tsx scripts/update-tags.ts --dry-run",
+    "fix:tags": "tsx scripts/update-tags.ts --write"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.10",
