@@ -1,0 +1,153 @@
+---
+import { getCollection } from 'astro:content';
+import SEO from '../../components/SEO.astro';
+import ScrollProgress from '../../components/ScrollProgress.astro';
+import MinimalNav from '../../components/MinimalNav.astro';
+import Footer from '../../components/Footer.astro';
+import '../../styles/global.css';
+
+export const prerender = true;
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const tagCounts = new Map<string, number>();
+
+for (const post of posts) {
+  for (const t of post.data.tags || []) {
+    if (!t || typeof t !== 'string') continue;
+    const tag = t.trim();
+    if (!tag || tag.toLowerCase().startsWith('hash-')) continue;
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+  }
+}
+
+const tags = Array.from(tagCounts.entries())
+  .map(([tag, count]) => ({ tag, count }))
+  .sort((a, b) => a.tag.localeCompare(b.tag));
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <SEO
+    title="Tags | Neurohackingly"
+    description="Browse all tags used on Neurohackingly to discover articles by topic."
+    category="blog"
+    tags={tags.map((t) => t.tag)}
+  />
+  <script is:inline>
+    const getTheme = () => localStorage.getItem('theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    document.documentElement.setAttribute('data-theme', getTheme());
+
+    window.toggleTheme = () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    };
+  </script>
+</head>
+<body>
+  <ScrollProgress />
+  <MinimalNav />
+
+  <main>
+    <header class="tags-header">
+      <h1>Browse by Tag</h1>
+      <p>{tags.length} tag{tags.length === 1 ? '' : 's'} · {posts.length} article{posts.length === 1 ? '' : 's'}</p>
+    </header>
+
+    <section class="tags-section">
+      {tags.length === 0 ? (
+        <p class="no-tags">No tags found yet.</p>
+      ) : (
+        <ul class="tags-grid">
+          {tags.map(({ tag, count }) => (
+            <li class="tag-pill">
+              <a href={`/tag/${encodeURIComponent(tag)}`}>
+                <span class="tag-name">#{tag}</span>
+                <span class="tag-count">{count}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  </main>
+
+  <Footer />
+</body>
+</html>
+
+<style>
+  .tags-header {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 1rem;
+    text-align: center;
+  }
+
+  .tags-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .tags-header p {
+    color: var(--color-text-light);
+    font-size: 0.95rem;
+  }
+
+  .tags-section {
+    max-width: 720px;
+    margin: 0 auto 4rem;
+    padding: 0 1.5rem 2rem;
+  }
+
+  .no-tags {
+    text-align: center;
+    color: var(--color-text-light);
+  }
+
+  .tags-grid {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .tag-pill a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border-light, #e5e7eb);
+    background: color-mix(in srgb, var(--color-bg, #fff) 92%, transparent);
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition:
+      background var(--transition-fast),
+      border-color var(--transition-fast),
+      transform var(--transition-fast);
+  }
+
+  .tag-pill a:hover {
+    background: color-mix(in srgb, var(--color-accent-soft, #eef2ff) 40%, var(--color-bg, #fff));
+    border-color: var(--color-accent);
+    transform: translateY(-1px);
+  }
+
+  .tag-name {
+    font-weight: 500;
+  }
+
+  .tag-count {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+  }
+</style>
+

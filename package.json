@@ -18,7 +18,8 @@
     "audit:migration": "tsx scripts/pre-migration-audit.ts",
     "fix:internal-links": "tsx scripts/update-internal-links.ts",
     "audit:tags": "tsx scripts/update-tags.ts --dry-run",
-    "fix:tags": "tsx scripts/update-tags.ts --write"
+    "fix:tags": "tsx scripts/update-tags.ts --write",
+    "validate:tags": "tsx scripts/validate-tags.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.10",
