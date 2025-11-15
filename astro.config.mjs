@@ -3,6 +3,11 @@ import { defineConfig } from 'astro/config';
 import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
@@ -25,6 +30,39 @@ export default defineConfig({
       rollupOptions: {
         external: ['/pagefind/pagefind.js']
       }
-    }
+    },
+    server: {
+      fs: {
+        // Allow serving files from dist directory during dev
+        allow: [path.resolve(__dirname, 'dist')]
+      }
+    },
+    plugins: [
+      {
+        name: 'pagefind-dev-server',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            if (req.url?.startsWith('/pagefind/')) {
+              const pagefindPath = path.join(__dirname, 'dist', req.url);
+              if (fs.existsSync(pagefindPath)) {
+                const ext = path.extname(pagefindPath);
+                const contentTypes = {
+                  '.js': 'application/javascript',
+                  '.json': 'application/json',
+                  '.css': 'text/css',
+                  '.pf_meta': 'application/octet-stream',
+                  '.pf_index': 'application/octet-stream',
+                  '.pf_fragment': 'application/octet-stream'
+                };
+                res.setHeader('Content-Type', contentTypes[ext] || 'application/octet-stream');
+                res.end(fs.readFileSync(pagefindPath));
+                return;
+              }
+            }
+            next();
+          });
+        }
+      }
+    ]
   }
 });

@@ -8,7 +8,6 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "postbuild": "npx pagefind --site dist",
     "build:search": "astro build && npx pagefind --site dist",
     "copy:pagefind": "shx cp -r dist/pagefind public/",
     "dev:with-search": "npm run build:search && npm run copy:pagefind && astro dev",

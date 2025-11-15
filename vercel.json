@@ -1,4 +1,5 @@
 {
+  "buildCommand": "astro build && npx pagefind --site .vercel/output/static",
   "redirects": [
     {
       "source": "/blog/:slug((?!tag).*)",
