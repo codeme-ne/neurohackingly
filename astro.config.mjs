@@ -19,5 +19,12 @@ export default defineConfig({
       theme: 'github-dark-dimmed',
       wrap: true
     }
+  },
+  vite: {
+    build: {
+      rollupOptions: {
+        external: ['/pagefind/pagefind.js']
+      }
+    }
   }
 });

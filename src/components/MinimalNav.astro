@@ -1,5 +1,10 @@
 ---
 // Minimal navigation component for Cold Takes design
+import Search from './Search.astro';
+
+const currentPath = Astro.url.pathname;
+const isHome = currentPath === '/' || currentPath === '';
+const isNow = currentPath.startsWith('/now');
 ---
 
 <nav class="minimal-nav">
@@ -7,9 +12,22 @@
     <a href="/" class="logo">Neurohackingly</a>
     <div class="nav-right">
       <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/now">Now</a>
+        <a
+          href="/"
+          class={`nav-link ${isHome ? 'active' : ''}`}
+          aria-current={isHome ? 'page' : undefined}
+        >
+          Home
+        </a>
+        <a
+          href="/now"
+          class={`nav-link ${isNow ? 'active' : ''}`}
+          aria-current={isNow ? 'page' : undefined}
+        >
+          Now
+        </a>
       </div>
+      <Search />
       <button
         onclick="window.toggleTheme()"
         class="theme-toggle"
@@ -71,10 +89,20 @@
     color: var(--color-text);
     text-decoration: none;
     font-size: 0.95rem;
+    padding-bottom: 0.15rem;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
   }
 
   .nav-links a:hover {
     color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+  }
+
+  .nav-links a.active {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+    font-weight: 600;
   }
 
   .theme-toggle {
@@ -119,6 +147,11 @@
     }
 
     .theme-toggle {
+      padding: 0.4rem;
+    }
+
+    /* Ensure search trigger matches theme toggle on mobile */
+    .nav-right :global(.search-trigger) {
       padding: 0.4rem;
     }
   }

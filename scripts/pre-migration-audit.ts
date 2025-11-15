@@ -31,10 +31,10 @@ async function audit() {
 
   slugs.forEach((ids, slug) => {
     if (ids.length > 1) {
-      errors.push(`❌ Duplicate slug "${slug}": ${ids.join(', ')}`);
+      errors.push(`❌ Duplicate slug \"${slug}\": ${ids.join(', ')}`);
     }
     if (RESERVED.includes(slug)) {
-      errors.push(`❌ Reserved slug collision: "${slug}" in ${ids[0]}`);
+      errors.push(`❌ Reserved slug collision: \"${slug}\" in ${ids[0]}`);
     }
   });
 
@@ -66,3 +66,4 @@ async function audit() {
 }
 
 audit();
+

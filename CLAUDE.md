@@ -10,6 +10,8 @@ Neurohackingly is a personal blog built with Astro 5, deployed to Vercel. The si
 - RSS feed generation
 - Server-side rendering (SSR) with Vercel adapter
 - Tag-based content organization
+- Full-text search powered by Pagefind
+- Dark/light theme toggle with neural blue accent
 
 **Site URL:** https://neurohackingly.com
 
@@ -19,11 +21,20 @@ Neurohackingly is a personal blog built with Astro 5, deployed to Vercel. The si
 # Start development server
 npm run dev
 
-# Build for production
+# Build for production (includes Pagefind search index)
 npm run build
 
 # Preview production build
 npm run preview
+
+# Build with search index for development
+npm run build:search
+
+# Copy Pagefind assets to public directory
+npm run copy:pagefind
+
+# Development with search enabled (builds search index first)
+npm run dev:with-search
 
 # Upgrade Astro dependencies (interactive)
 npm run upgrade:astro
@@ -40,6 +51,13 @@ npm run fix:internal-links
 # Run pre-migration audit
 npm run audit:migration
 ```
+
+### Working with Search in Development
+
+Search functionality requires a Pagefind index. Options:
+1. **Build first, then dev:** `npm run build && npm run dev` (search works after initial build)
+2. **Use dev:with-search:** `npm run dev:with-search` (rebuilds search index + starts dev server)
+3. **Production:** `npm run build` automatically generates the search index via postbuild hook
 
 ## Node.js Version
 
@@ -113,11 +131,19 @@ src/pages/
 src/components/
 ├── SEO.astro              # Meta tags, Open Graph, Twitter cards
 ├── ScrollProgress.astro   # Reading progress indicator
-├── MinimalNav.astro       # Navigation header
+├── MinimalNav.astro       # Navigation header with theme toggle and search
+├── Search.astro           # Pagefind search modal with keyboard shortcuts
 ├── Footer.astro           # Site footer with social links
 ├── PostListTable.astro    # Blog post listing
 ├── NewsletterSignup.astro # Email subscription form
 └── GifVideo.astro         # Optimized GIF playback
+```
+
+### Utilities
+
+```
+src/utils/
+└── debounce.ts            # Generic debounce function for search input
 ```
 
 ### Layouts
@@ -172,6 +198,28 @@ The RSS feed (`/rss.xml`) maintains backward compatibility:
 - Links point to new root URLs (`/:slug`)
 - GUIDs use legacy `/blog/:slug` format to prevent duplicate entries in feed readers
 - This ensures existing subscribers don't see duplicate posts
+
+### Search Feature (Pagefind)
+
+Search is powered by Pagefind, a static search library:
+- **Build process:** Pagefind runs via `postbuild` hook in package.json
+- **Search index location:** `dist/pagefind/` (auto-generated at build time)
+- **Public assets:** `public/pagefind/` (for development preview)
+- **Component:** `src/components/Search.astro` provides the search modal UI
+- **Keyboard shortcuts:** `Cmd/Ctrl+K` to open, `Esc` to close, arrow keys to navigate
+- **Features:** Real-time search, debounced input (300ms), keyboard navigation, excerpt highlighting
+- **Configuration:** Vite excludes `/pagefind/pagefind.js` from bundle (loaded at runtime)
+
+**Important:** Search won't work in dev mode until you run `npm run build` or `npm run dev:with-search` first.
+
+### Theme System
+
+Dark/light theme toggle with system preference detection:
+- **Toggle button:** Located in `MinimalNav.astro` navigation
+- **Theme storage:** Persists in localStorage as `data-theme` attribute on `<html>`
+- **Color scheme:** Neural blue accent (`#3b82f6`) consistent across both themes
+- **CSS variables:** Theme colors defined in `src/styles/global.css` with `:root[data-theme="dark"]` overrides
+- **Global function:** `window.toggleTheme()` available for programmatic theme switching
 
 ## Key Patterns
 
@@ -234,6 +282,7 @@ If you accidentally use `/blog/` paths, run `npm run fix:internal-links`.
 - **Adapter:** Vercel with web analytics
 - **Integrations:** MDX, Sitemap
 - **Markdown:** Shiki syntax highlighting (github-dark-dimmed theme)
+- **Vite config:** Excludes `/pagefind/pagefind.js` from build (runtime-loaded external)
 
 ## TypeScript
 
