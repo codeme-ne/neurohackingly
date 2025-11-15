@@ -33,13 +33,19 @@ export default defineConfig({
     },
     server: {
       fs: {
-        // Allow serving files from dist directory during dev
-        allow: [path.resolve(__dirname, 'dist')]
+        // Allow serving files from project root and dist directory
+        allow: [__dirname]
       }
     },
     plugins: [
       {
         name: 'pagefind-dev-server',
+        resolveId(id) {
+          // Tell Vite to treat /pagefind/pagefind.js as external
+          if (id === '/pagefind/pagefind.js' || id.startsWith('/pagefind/')) {
+            return { id, external: 'absolute' };
+          }
+        },
         configureServer(server) {
           server.middlewares.use((req, res, next) => {
             if (req.url?.startsWith('/pagefind/')) {

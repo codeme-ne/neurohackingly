@@ -54,6 +54,20 @@
   </span>
 </button>
 
+<script is:inline type="module">
+  if (typeof window !== 'undefined') {
+    // Preload Pagefind from the static /pagefind assets when available.
+    // This import runs purely in the browser and is not processed by Vite.
+    window.__pagefindPromise ??= import('/pagefind/pagefind.js').catch((err) => {
+      console.warn(
+        'Search: Failed to load /pagefind/pagefind.js. Run "npm run dev:with-search" in development or ensure Pagefind is built in production.',
+        err
+      );
+      throw err;
+    });
+  }
+</script>
+
 <script>
   import { SearchModal } from '../utils/SearchModal';
 
@@ -91,7 +105,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     color: var(--color-text);
   }
 
@@ -223,7 +237,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 0.375rem;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
   }
 
   .search-close:hover {
@@ -233,26 +247,34 @@
 
   /* Search Results */
   .search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
     overflow-y: auto;
     max-height: calc(70vh - 120px);
-    padding: 0.5rem;
+    padding: 0.75rem 0.75rem 1rem;
   }
 
   .search-result {
     display: block;
-    padding: 1rem 1.25rem;
+    padding: 0.9rem 1rem;
     border-radius: 0.5rem;
     text-decoration: none;
     color: var(--color-text);
-    transition: all 0.15s ease;
-    margin-bottom: 0.5rem;
-    border: 1px solid transparent;
+    transition: all var(--transition-fast);
+    margin-bottom: 0;
+    border: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+    background: var(--color-surface);
+    box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03);
   }
 
   .search-result:hover,
   .search-result.selected {
-    background: var(--color-bg-light);
-    border-color: var(--color-border);
+    background: var(--color-surface);
+    border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+    box-shadow:
+      0 6px 16px rgba(15, 23, 42, 0.08),
+      0 0 0 1px rgba(15, 23, 42, 0.02);
   }
 
   .result-title {
@@ -292,6 +314,7 @@
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
+    margin-top: 0.35rem;
   }
 
   .result-tag {

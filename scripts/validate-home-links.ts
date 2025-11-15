@@ -39,6 +39,10 @@ function extractBlogLinksFromHTML(html: string): string[] {
     try {
       if (href.startsWith('http://') || href.startsWith('https://')) {
         const u = new URL(href);
+        // Skip external domains entirely – we only care about same-site links.
+        if (u.hostname && u.hostname !== 'neurohackingly.com' && u.hostname !== 'www.neurohackingly.com') {
+          continue;
+        }
         href = u.pathname;
       }
     } catch {}
@@ -108,12 +112,20 @@ async function main() {
   }
 
   // File-based check from dist
-  const distDir = path.join(process.cwd(), 'dist');
-  const homePath = path.join(distDir, 'index.html');
-  if (!existsSync(homePath)) {
-    console.error('dist/index.html not found. Build first: npm run build');
+  const distRoot = path.join(process.cwd(), 'dist');
+  const candidates = [
+    { home: path.join(distRoot, 'index.html'), base: distRoot },
+    { home: path.join(distRoot, 'client', 'index.html'), base: path.join(distRoot, 'client') },
+    { home: path.join(distRoot, 'client', 'home', 'index.html'), base: path.join(distRoot, 'client') }
+  ];
+
+  const found = candidates.find((c) => existsSync(c.home));
+  if (!found) {
+    console.error('No built homepage found in dist/. Build first: npm run build');
     process.exit(2);
   }
+
+  const { home: homePath, base: distDir } = found;
   const html = await readFile(homePath, 'utf8');
   const links = extractBlogLinksFromHTML(html);
   const results = await checkViaFiles(distDir, links);
@@ -131,4 +143,3 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-
