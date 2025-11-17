@@ -53,7 +53,9 @@ export default defineConfig({
               return;
             }
 
-            const pagefindPath = path.join(__dirname, 'dist', req.url);
+            // Use .vercel/output/static for consistency with production deployment
+            // This ensures dev and prod use the same Pagefind index
+            const pagefindPath = path.join(__dirname, '.vercel/output/static', req.url);
             const contentTypes = {
               '.js': 'application/javascript',
               '.json': 'application/json',

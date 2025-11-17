@@ -3,13 +3,14 @@
   "type": "module",
   "version": "0.0.1",
   "engines": {
-    "node": ">=22.0.0 <24.0.0"
+    "node": ">=22.0.0 <25.0.0"
   },
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "rm -rf dist .vercel/output public/pagefind",
     "build": "astro build",
-    "postbuild": "npx pagefind --site dist",
-    "build:search": "astro build && npx pagefind --site dist",
+    "postbuild": "npx pagefind --site .vercel/output/static && tsx scripts/validate-pagefind-build.ts",
+    "build:search": "astro build && npx pagefind --site .vercel/output/static",
     "dev:with-search": "npm run build:search && astro dev",
     "preview": "astro preview",
     "astro": "astro",

@@ -2,6 +2,11 @@
   "buildCommand": "npm run build",
   "redirects": [
     {
+      "source": "/client/:path*",
+      "destination": "/:path*",
+      "permanent": true
+    },
+    {
       "source": "/blog/:slug((?!tag).*)",
       "destination": "/:slug",
       "permanent": true

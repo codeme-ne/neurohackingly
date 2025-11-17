@@ -21,7 +21,7 @@ Neurohackingly is a personal blog built with Astro 5, deployed to Vercel. The si
 # Start development server
 npm run dev
 
-# Build for production (includes Pagefind search index)
+# Build for production (includes Pagefind search index + validation)
 npm run build
 
 # Preview production build
@@ -29,9 +29,6 @@ npm run preview
 
 # Build with search index for development
 npm run build:search
-
-# Copy Pagefind assets to public directory
-npm run copy:pagefind
 
 # Development with search enabled (builds search index first)
 npm run dev:with-search
@@ -203,14 +200,21 @@ The RSS feed (`/rss.xml`) maintains backward compatibility:
 
 Search is powered by Pagefind, a static search library:
 - **Build process:** Pagefind runs via `postbuild` hook in package.json
-- **Search index location:** `dist/pagefind/` (auto-generated at build time)
-- **Public assets:** `public/pagefind/` (for development preview)
+- **Search index location:** `.vercel/output/static/pagefind/` (production deployment path)
+- **Dev server:** Serves Pagefind from `.vercel/output/static/pagefind/` (same as production)
 - **Component:** `src/components/Search.astro` provides the search modal UI
 - **Keyboard shortcuts:** `Cmd/Ctrl+K` to open, `Esc` to close, arrow keys to navigate
 - **Features:** Real-time search, debounced input (300ms), keyboard navigation, excerpt highlighting
 - **Configuration:** Vite excludes `/pagefind/pagefind.js` from bundle (loaded at runtime)
 
 **Important:** Search won't work in dev mode until you run `npm run build` or `npm run dev:with-search` first.
+
+**Architecture Note:**
+- Astro with Vercel adapter outputs to `.vercel/output/static/` (this is what Vercel deploys)
+- `dist/client/` is created as a build artifact but is NOT deployed
+- Both dev and production use `.vercel/output/static/pagefind/` for consistency
+- `prebuild` script cleans `dist/` and `.vercel/output/` to prevent stale indexes
+- `postbuild` script validates no duplicate indexes exist
 
 ### Theme System
 
