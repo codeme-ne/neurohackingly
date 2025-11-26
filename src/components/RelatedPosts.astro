@@ -1,0 +1,145 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  currentSlug: string;
+  currentTags: string[];
+  allPosts: CollectionEntry<"blog">[];
+}
+
+const { currentSlug, currentTags, allPosts } = Astro.props;
+
+// Filter out current post and drafts
+const eligiblePosts = allPosts.filter(
+  (post) => post.slug !== currentSlug && !post.data.draft
+);
+
+// Score posts by shared tags
+const scoredPosts = eligiblePosts.map((post) => {
+  const postTags = post.data.tags || [];
+  const sharedTags = postTags.filter((tag) =>
+    currentTags.some((currentTag) => currentTag.toLowerCase() === tag.toLowerCase())
+  );
+  return {
+    post,
+    score: sharedTags.length,
+  };
+});
+
+// Sort by score DESC, then pubDate DESC
+scoredPosts.sort((a, b) => {
+  if (b.score !== a.score) return b.score - a.score;
+  return b.post.data.pubDate.getTime() - a.post.data.pubDate.getTime();
+});
+
+// Take top 3, or fill with most recent if < 3 matches
+let relatedPosts = scoredPosts.slice(0, 3).map((item) => item.post);
+
+if (relatedPosts.length < 3) {
+  const mostRecent = eligiblePosts
+    .filter((post) => !relatedPosts.some((rp) => rp.slug === post.slug))
+    .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+    .slice(0, 3 - relatedPosts.length);
+
+  relatedPosts = [...relatedPosts, ...mostRecent];
+}
+---
+
+{
+  relatedPosts.length > 0 && (
+    <section class="related-posts">
+      <h2>You might also like</h2>
+      <div class="related-grid">
+        {relatedPosts.map((post) => (
+          <a href={`/${post.slug}`} class="related-card">
+            <h3>{post.data.title}</h3>
+            <div class="related-meta">
+              <time datetime={post.data.pubDate.toISOString()}>
+                {post.data.pubDate.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </time>
+              {post.data.readingTime && (
+                <>
+                  <span>·</span>
+                  <span>{post.data.readingTime} min read</span>
+                </>
+              )}
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .related-posts {
+    max-width: var(--max-width);
+    margin: var(--space-2xl) auto var(--space-xl);
+    padding: 0 var(--space-md);
+  }
+
+  h2 {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .related-card {
+    display: block;
+    padding: var(--space-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all var(--transition-base);
+  }
+
+  .related-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px var(--color-overlay);
+    transform: translateY(-2px);
+  }
+
+  .related-card h3 {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+    line-height: 1.3;
+  }
+
+  .related-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-light);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  @media (max-width: 768px) {
+    .related-posts {
+      margin: var(--space-xl) auto var(--space-lg);
+    }
+
+    h2 {
+      font-size: var(--font-size-xl);
+    }
+
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

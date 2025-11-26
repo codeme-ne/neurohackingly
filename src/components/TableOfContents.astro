@@ -7,9 +7,9 @@ interface Props {
 
 const { headings } = Astro.props;
 
-// Filter out h1 (title) and limit depth
+// Filter to h2 and h3 only (depth 2-3)
 const tocHeadings = headings.filter(
-    (heading) => heading.depth > 1 && heading.depth <= 4,
+    (heading) => heading.depth === 2 || heading.depth === 3,
 );
 ---
 
@@ -82,7 +82,7 @@ const tocHeadings = headings.filter(
             threshold: 0,
         };
 
-        const headings = document.querySelectorAll("h2[id], h3[id], h4[id]");
+        const headings = document.querySelectorAll("h2[id], h3[id]");
         const headingMap = new Map();
 
         headings.forEach((heading, index) => {
@@ -111,11 +111,21 @@ const tocHeadings = headings.filter(
             // Update lines
             lines.forEach((line, i) => {
                 line.classList.toggle('active', i === index);
+                if (i === index) {
+                    line.setAttribute('aria-current', 'location');
+                } else {
+                    line.removeAttribute('aria-current');
+                }
             });
 
             // Update links
             links.forEach((link, i) => {
                 link.classList.toggle('active', i === index);
+                if (i === index) {
+                    link.setAttribute('aria-current', 'location');
+                } else {
+                    link.removeAttribute('aria-current');
+                }
             });
         }
 
@@ -209,7 +219,6 @@ const tocHeadings = headings.filter(
     /* Line widths based on depth */
     .toc-line.depth-2 .line { width: 24px; }
     .toc-line.depth-3 .line { width: 16px; }
-    .toc-line.depth-4 .line { width: 10px; }
 
     .toc-line:hover .line {
         background: var(--toc-line-hover);
@@ -301,9 +310,8 @@ const tocHeadings = headings.filter(
         font-weight: 500;
     }
 
-    /* Indentation */
+    /* Indentation for h3 under h2 */
     .toc-item.depth-3 .toc-link { padding-left: 20px; }
-    .toc-item.depth-4 .toc-link { padding-left: 32px; }
 
     /* ===== MOBILE/TABLET: FAB + Overlay ===== */
     .toc-fab {

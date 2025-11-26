@@ -1,0 +1,57 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  image?: string;
+  url: string;
+  author?: string;
+  authorUrl?: string;
+}
+
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  image,
+  url,
+  author = "Lukas Zangerl",
+  authorUrl = "https://neurohackingly.com",
+} = Astro.props;
+
+const publisherLogo = Astro.site
+  ? new URL("/images/og/default.svg", Astro.site).href
+  : "https://neurohackingly.com/images/og/default.svg";
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: title,
+  description,
+  author: {
+    "@type": "Person",
+    name: author,
+    url: authorUrl,
+  },
+  datePublished: pubDate.toISOString(),
+  dateModified: (updatedDate ?? pubDate).toISOString(),
+  ...(image && { image }),
+  publisher: {
+    "@type": "Organization",
+    name: "Neurohackingly",
+    url: "https://neurohackingly.com",
+    logo: {
+      "@type": "ImageObject",
+      url: publisherLogo,
+    },
+  },
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": url,
+  },
+};
+---
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(schema, null, 2)} />

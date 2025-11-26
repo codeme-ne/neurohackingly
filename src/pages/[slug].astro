@@ -64,11 +64,14 @@ if (!entry) {
 const { Content, headings } = entry
   ? await entry.render()
   : ({ Content: () => null, headings: [] } as any);
+
+// Get all posts for related posts component
+const allPosts = await getCollection("blog", ({ data }) => !data.draft);
 ---
 
 {
   entry && (
-    <BlogPost {...entry.data} headings={headings}>
+    <BlogPost {...entry.data} headings={headings} slug={slug} allPosts={allPosts}>
       <Content />
     </BlogPost>
   )
