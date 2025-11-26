@@ -1,116 +1,125 @@
 ---
-import SEO from '../components/SEO.astro';
-import ScrollProgress from '../components/ScrollProgress.astro';
-import '../styles/global.css';
-import MinimalNav from '../components/MinimalNav.astro';
+import SEO from "../components/SEO.astro";
+import ScrollProgress from "../components/ScrollProgress.astro";
+import "../styles/global.css";
+import ThemeScript from "../components/ThemeScript.astro";
+import MinimalNav from "../components/MinimalNav.astro";
 
-const status = Astro.url.searchParams.get('status');
+const status = Astro.url.searchParams.get("status");
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <SEO
-    title="Newsletter | Neurohackingly"
-    description="Join the Neurohackingly newsletter for weekly insights on productivity, AI, and personal-growth"
-    category="newsletter"
-  />
-  <script is:inline>
-    const getTheme = () => localStorage.getItem('theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  <head>
+    <SEO
+      title="Newsletter | Neurohackingly"
+      description="Join the Neurohackingly newsletter for weekly insights on productivity, AI, and personal-growth"
+      category="newsletter"
+    />
+    <ThemeScript />
+  </head>
+  <body>
+    <ScrollProgress />
+    <MinimalNav />
 
-    document.documentElement.setAttribute('data-theme', getTheme());
-
-    window.toggleTheme = () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    };
-  </script>
-</head>
-<body>
-  <ScrollProgress />
-  <MinimalNav />
-
-  <main>
-    <header class="hero newsletter-hero">
-      <h1>Sunday Shares</h1>
-      <p class="tagline">Your Weekly Dose of Actionable Insights</p>
-      <p class="subtitle">
-        Every Sunday, get practical productivity tips, AI insights, and science-backed strategies
-        delivered straight to your inbox.
-      </p>
-      {status === 'success' && (
-        <p class="newsletter-status newsletter-status--success">
-          Thanks! Check your inbox to confirm your subscription.
+    <main>
+      <header class="hero newsletter-hero">
+        <h1>Sunday Shares</h1>
+        <p class="tagline">Your Weekly Dose of Actionable Insights</p>
+        <p class="subtitle">
+          Every Sunday, get practical productivity tips, AI insights, and
+          science-backed strategies delivered straight to your inbox.
         </p>
-      )}
-      {status === 'already' && (
-        <p class="newsletter-status newsletter-status--info">
-          Looks like you are already subscribed. Appreciate having you here!
-        </p>
-      )}
-      {status === 'error' && (
-        <p class="newsletter-status newsletter-status--error">
-          Something went wrong. Please try again or email me at neurohackingly@gmail.com.
-        </p>
-      )}
-    </header>
+        {
+          status === "success" && (
+            <p class="newsletter-status newsletter-status--success">
+              Thanks! Check your inbox to confirm your subscription.
+            </p>
+          )
+        }
+        {
+          status === "already" && (
+            <p class="newsletter-status newsletter-status--info">
+              Looks like you are already subscribed. Appreciate having you here!
+            </p>
+          )
+        }
+        {
+          status === "error" && (
+            <p class="newsletter-status newsletter-status--error">
+              Something went wrong. Please try again or email me at
+              neurohackingly@gmail.com.
+            </p>
+          )
+        }
+      </header>
 
-    <section class="newsletter-section">
-      <p class="newsletter-lede">
-        Join a growing community of readers who are upgrading their brain, mind, and body.
-      </p>
-
-      <div class="newsletter-card">
-        <h3>Subscribe Now</h3>
-        <p class="newsletter-subcopy">
-          Practical Sunday systems and science-backed prompts—no spam, ever.
+      <section class="newsletter-section">
+        <p class="newsletter-lede">
+          Join a growing community of readers who are upgrading their brain,
+          mind, and body.
         </p>
 
-        <form action="/api/subscribe" method="post" class="newsletter-form" novalidate>
-          <div class="newsletter-field">
-            <label class="newsletter-label" for="newsletter-email">Email address</label>
+        <div class="newsletter-card">
+          <h3>Subscribe Now</h3>
+          <p class="newsletter-subcopy">
+            Practical Sunday systems and science-backed prompts—no spam, ever.
+          </p>
+
+          <form
+            action="/api/subscribe"
+            method="post"
+            class="newsletter-form"
+            novalidate
+          >
+            <div class="newsletter-field">
+              <label class="newsletter-label" for="newsletter-email"
+                >Email address</label
+              >
+              <input
+                type="email"
+                name="email"
+                id="newsletter-email"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+                class="newsletter-input"
+              />
+            </div>
+            <div class="newsletter-field">
+              <label class="newsletter-label" for="newsletter-name"
+                >First name (optional)</label
+              >
+              <input
+                type="text"
+                name="name"
+                id="newsletter-name"
+                placeholder="First name (optional)"
+                autocomplete="given-name"
+                class="newsletter-input"
+              />
+            </div>
+            <input type="hidden" name="source" value="newsletter-page" />
             <input
-            type="email"
-            name="email"
-            id="newsletter-email"
-            placeholder="you@example.com"
-            autocomplete="email"
-            required
-            class="newsletter-input"
-          />
-          </div>
-          <div class="newsletter-field">
-            <label class="newsletter-label" for="newsletter-name">First name (optional)</label>
-            <input
-            type="text"
-            name="name"
-            id="newsletter-name"
-            placeholder="First name (optional)"
-            autocomplete="given-name"
-            class="newsletter-input"
-          />
-          </div>
-          <input type="hidden" name="source" value="newsletter-page" />
-          <input type="text" name="website" tabindex="-1" autocomplete="off" class="newsletter-honeypot" aria-hidden="true" />
-          <button type="submit" class="newsletter-submit">
-            Subscribe
-          </button>
-        </form>
-      </div>
+              type="text"
+              name="website"
+              tabindex="-1"
+              autocomplete="off"
+              class="newsletter-honeypot"
+              aria-hidden="true"
+            />
+            <button type="submit" class="newsletter-submit"> Subscribe </button>
+          </form>
+        </div>
 
-      <p class="newsletter-footnote">
-        No spam. Just high quality content.
-      </p>
-    </section>
-  </main>
+        <p class="newsletter-footnote">No spam. Just high quality content.</p>
+      </section>
+    </main>
 
-  <footer>
-    <p>© 2025 Neurohackingly by Lukas Zangerl</p>
-  </footer>
-</body>
+    <footer>
+      <p>© 2025 Neurohackingly by Lukas Zangerl</p>
+    </footer>
+  </body>
 </html>
 
 <style>
@@ -192,7 +201,9 @@ const status = Astro.url.searchParams.get('status');
     border-radius: 0.5rem;
     background: var(--color-bg);
     color: var(--color-text);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
     font-family: inherit;
   }
 
@@ -225,7 +236,10 @@ const status = Astro.url.searchParams.get('status');
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      background 0.2s ease;
   }
 
   .newsletter-submit:hover {

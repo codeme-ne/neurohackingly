@@ -1,0 +1,251 @@
+---
+import type { MarkdownHeading } from "astro";
+
+interface Props {
+    headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+
+// Filter out h1 (title) and limit depth if needed
+const tocHeadings = headings.filter(
+    (heading) => heading.depth > 1 && heading.depth <= 3,
+);
+---
+
+<nav class="toc-container" aria-label="Table of Contents">
+    <div class="toc-trigger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <div class="toc-content">
+        <div class="toc-header">In this article</div>
+        <ul class="toc-list">
+            {
+                tocHeadings.map((heading) => (
+                    <li class={`toc-item depth-${heading.depth}`}>
+                        <a href={`#${heading.slug}`} class="toc-link">
+                            {heading.text}
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+</nav>
+
+<script>
+    // Client-side logic for highlighting active section
+    const observerOptions = {
+        root: null,
+        rootMargin: "-100px 0px -66%",
+        threshold: 1.0,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            const id = entry.target.getAttribute("id");
+            const tocLink = document.querySelector(`.toc-link[href="#${id}"]`);
+
+            if (entry.isIntersecting) {
+                document
+                    .querySelectorAll(".toc-link")
+                    .forEach((link) => link.classList.remove("active"));
+                if (tocLink) {
+                    tocLink.classList.add("active");
+                }
+            }
+        });
+    }, observerOptions);
+
+    // Track all headings
+    document.querySelectorAll("h2, h3").forEach((heading) => {
+        observer.observe(heading);
+    });
+
+    // Prevent body scroll when scrolling inside TOC if it's not scrollable
+    const tocContents = document.querySelectorAll(".toc-content");
+    tocContents.forEach((tocContent) => {
+        tocContent.addEventListener(
+            "wheel",
+            (e) => {
+                const isScrollable =
+                    tocContent.scrollHeight > tocContent.clientHeight;
+                if (!isScrollable) {
+                    e.preventDefault();
+                }
+            },
+            { passive: false },
+        );
+    });
+</script>
+
+<style>
+    .toc-container {
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        z-index: 100;
+        display: none; /* Hidden on mobile by default */
+    }
+
+    @media (min-width: 1200px) {
+        .toc-container {
+            display: block;
+        }
+    }
+
+    /* Trigger Icon (Hamburger) */
+    .toc-trigger {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+
+    .toc-trigger:hover {
+        background-color: rgba(128, 128, 128, 0.1);
+    }
+
+    .toc-trigger span {
+        display: block;
+        height: 2px;
+        background-color: var(--color-text-muted, #999);
+        border-radius: 2px;
+        transition:
+            background-color 0.2s ease,
+            width 0.2s ease;
+    }
+
+    /* Varying widths to look like a document/list, not a hamburger menu */
+    .toc-trigger span:nth-child(1) {
+        width: 100%;
+    }
+    .toc-trigger span:nth-child(2) {
+        width: 70%;
+    }
+    .toc-trigger span:nth-child(3) {
+        width: 40%;
+    }
+
+    /* Center the lines */
+    .toc-trigger {
+        align-items: center;
+    }
+
+    .toc-container:hover .toc-trigger span {
+        background-color: var(--color-text-main, #333);
+        width: 100%; /* Expand on hover for effect */
+    }
+
+    /* Content Panel */
+    .toc-content {
+        position: absolute;
+        top: 0;
+        right: 40px; /* Position to the left of the trigger */
+        width: 240px;
+        background: var(
+            --color-bg-body,
+            #1a1a1a
+        ); /* Dark bg as per screenshot */
+        border: 1px solid rgba(128, 128, 128, 0.2);
+        border-radius: 8px;
+        padding: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(10px);
+        transition: all 0.2s ease;
+        max-height: 70vh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    /* Show content on hover over container */
+    .toc-container:hover .toc-content {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+    }
+
+    .toc-header {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-text-muted, #888);
+        margin-bottom: 8px;
+        padding-left: 8px;
+    }
+
+    .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .toc-item {
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+
+    .toc-link {
+        display: block;
+        padding: 6px 8px;
+        color: var(--color-text-muted, #aaa);
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .toc-link:hover {
+        background-color: rgba(128, 128, 128, 0.1);
+        color: var(--color-text-main, #eee);
+    }
+
+    .toc-link.active {
+        color: var(--color-primary, #fff);
+        font-weight: 500;
+        background-color: rgba(128, 128, 128, 0.15);
+    }
+
+    /* Indentation */
+    .depth-3 {
+        padding-left: 12px;
+    }
+
+    /* Scrollbar for content */
+    .toc-content::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .toc-content::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .toc-content::-webkit-scrollbar-thumb {
+        background: rgba(128, 128, 128, 0.3);
+        border-radius: 2px;
+    }
+
+    /* Dark mode adjustments if needed, though default styling above is already dark-ish/neutral */
+    :global(.light) .toc-content {
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    :global(.light) .toc-link {
+        color: #666;
+    }
+    :global(.light) .toc-link:hover {
+        color: #000;
+    }
+</style>

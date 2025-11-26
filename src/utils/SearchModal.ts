@@ -125,7 +125,7 @@ export class SearchModal {
       return this.pagefind;
     }
 
-    const specifier = '/pagefind/pagefind.js';
+    const specifier = `${window.location.origin}/pagefind/pagefind.js`;
 
     try {
       // Avoid Vite trying to resolve at build time; load at runtime only

@@ -1,21 +1,22 @@
 ---
-import { getCollection } from 'astro:content';
-import SEO from '../../components/SEO.astro';
-import ScrollProgress from '../../components/ScrollProgress.astro';
-import MinimalNav from '../../components/MinimalNav.astro';
-import Footer from '../../components/Footer.astro';
-import '../../styles/global.css';
+import { getCollection } from "astro:content";
+import SEO from "../../components/SEO.astro";
+import ScrollProgress from "../../components/ScrollProgress.astro";
+import MinimalNav from "../../components/MinimalNav.astro";
+import Footer from "../../components/Footer.astro";
+import "../../styles/global.css";
+import ThemeScript from "../../components/ThemeScript.astro";
 
 export const prerender = true;
 
-const posts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = await getCollection("blog", ({ data }) => !data.draft);
 const tagCounts = new Map<string, number>();
 
 for (const post of posts) {
   for (const t of post.data.tags || []) {
-    if (!t || typeof t !== 'string') continue;
+    if (!t || typeof t !== "string") continue;
     const tag = t.trim();
-    if (!tag || tag.toLowerCase().startsWith('hash-')) continue;
+    if (!tag || tag.toLowerCase().startsWith("hash-")) continue;
     tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
   }
 }
@@ -25,59 +26,53 @@ const tags = Array.from(tagCounts.entries())
   .sort((a, b) => a.tag.localeCompare(b.tag));
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <SEO
-    title="Tags | Neurohackingly"
-    description="Browse all tags used on Neurohackingly to discover articles by topic."
-    category="blog"
-    tags={tags.map((t) => t.tag)}
-  />
-  <script is:inline>
-    const getTheme = () => localStorage.getItem('theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  <head>
+    <SEO
+      title="Tags | Neurohackingly"
+      description="Browse all tags used on Neurohackingly to discover articles by topic."
+      category="blog"
+      tags={tags.map((t) => t.tag)}
+    />
+    <ThemeScript />
+  </head>
+  <body>
+    <ScrollProgress />
+    <MinimalNav />
 
-    document.documentElement.setAttribute('data-theme', getTheme());
+    <main>
+      <header class="tags-header">
+        <h1>Browse by Tag</h1>
+        <p>
+          {tags.length} tag{tags.length === 1 ? "" : "s"} · {posts.length} article{
+            posts.length === 1 ? "" : "s"
+          }
+        </p>
+      </header>
 
-    window.toggleTheme = () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    };
-  </script>
-</head>
-<body>
-  <ScrollProgress />
-  <MinimalNav />
+      <section class="tags-section">
+        {
+          tags.length === 0 ? (
+            <p class="no-tags">No tags found yet.</p>
+          ) : (
+            <ul class="tags-grid">
+              {tags.map(({ tag, count }) => (
+                <li class="tag-pill">
+                  <a href={`/tag/${encodeURIComponent(tag)}`}>
+                    <span class="tag-name">#{tag}</span>
+                    <span class="tag-count">{count}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </section>
+    </main>
 
-  <main>
-    <header class="tags-header">
-      <h1>Browse by Tag</h1>
-      <p>{tags.length} tag{tags.length === 1 ? '' : 's'} · {posts.length} article{posts.length === 1 ? '' : 's'}</p>
-    </header>
-
-    <section class="tags-section">
-      {tags.length === 0 ? (
-        <p class="no-tags">No tags found yet.</p>
-      ) : (
-        <ul class="tags-grid">
-          {tags.map(({ tag, count }) => (
-            <li class="tag-pill">
-              <a href={`/tag/${encodeURIComponent(tag)}`}>
-                <span class="tag-name">#{tag}</span>
-                <span class="tag-count">{count}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  </main>
-
-  <Footer />
-</body>
+    <Footer />
+  </body>
 </html>
 
 <style>
@@ -136,7 +131,11 @@ const tags = Array.from(tagCounts.entries())
   }
 
   .tag-pill a:hover {
-    background: color-mix(in srgb, var(--color-accent-soft, #eef2ff) 40%, var(--color-bg, #fff));
+    background: color-mix(
+      in srgb,
+      var(--color-accent-soft, #eef2ff) 40%,
+      var(--color-bg, #fff)
+    );
     border-color: var(--color-accent);
     transform: translateY(-1px);
   }
@@ -150,4 +149,3 @@ const tags = Array.from(tagCounts.entries())
     color: var(--color-text-light);
   }
 </style>
-

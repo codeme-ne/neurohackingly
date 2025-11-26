@@ -3,9 +3,13 @@ import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   posts: CollectionEntry<'blog'>[];
+  showMoreButton?: boolean;
+  initialCount?: number;
 }
 
-const { posts } = Astro.props;
+const { posts, showMoreButton = false, initialCount = 10 } = Astro.props;
+const hasMorePosts = posts.length > initialCount && showMoreButton;
+const instanceId = `posts-${Math.random().toString(36).slice(2, 9)}`;
 
 // Calculate reading time (words / 200 wpm)
 function calculateReadTime(body: string): string {
@@ -24,27 +28,80 @@ function formatDate(date: Date): string {
 }
 ---
 
-<div class="post-list">
-  {posts.map((post) => (
-    <article class="post-item">
-      <time class="post-date" datetime={post.data.pubDate.toISOString()}>
-        {formatDate(post.data.pubDate)}
-      </time>
-      <h2 class="post-title">
-        <a href={`/${post.slug ?? post.id.replace('.mdx', '')}`}>
-          {post.data.title}
-        </a>
-      </h2>
-      <span class="post-read-time">{calculateReadTime(post.body)}</span>
-    </article>
-  ))}
+<div class={`posts-container ${hasMorePosts ? 'is-collapsed' : ''}`} data-total={posts.length} data-instance={instanceId}>
+  <div class="post-list" id={`list-${instanceId}`}>
+    {posts.map((post) => (
+      <article class="post-item">
+        <time class="post-date" datetime={post.data.pubDate.toISOString()}>
+          {formatDate(post.data.pubDate)}
+        </time>
+        <h2 class="post-title">
+          <a href={`/${post.slug ?? post.id.replace('.mdx', '')}`}>
+            {post.data.title}
+          </a>
+        </h2>
+        <span class="post-read-time">{calculateReadTime(post.body)}</span>
+      </article>
+    ))}
+  </div>
+
+  {hasMorePosts && (
+    <>
+      <div class="fade-overlay" aria-hidden="true"></div>
+      <div class="show-all-container">
+        <button
+          id={`btn-${instanceId}`}
+          class="show-all-btn"
+          aria-controls={`list-${instanceId}`}
+          aria-expanded="false"
+        >
+          Show all {posts.length} posts
+          <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+    </>
+  )}
 </div>
 
+{hasMorePosts && (
+  <script define:vars={{ instanceId }}>
+    const container = document.querySelector(`[data-instance="${instanceId}"]`);
+    const btn = document.getElementById(`btn-${instanceId}`);
+
+    if (container && btn) {
+      btn.addEventListener('click', () => {
+        container.classList.remove('is-collapsed');
+        btn.setAttribute('aria-expanded', 'true');
+      });
+    }
+  </script>
+)}
+
 <style>
+  /* Container with collapse state */
+  .posts-container {
+    position: relative;
+  }
+
   .post-list {
     max-width: 720px;
     margin: 0 auto;
     padding: 0 1.5rem;
+    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Collapsed state: limit height to ~10 posts */
+  .posts-container.is-collapsed .post-list {
+    max-height: 580px;
+    overflow: hidden;
+  }
+
+  /* Expanded state */
+  .posts-container:not(.is-collapsed) .post-list {
+    max-height: 10000px;
   }
 
   .post-item {
@@ -91,8 +148,89 @@ function formatDate(date: Date): string {
     white-space: nowrap;
   }
 
+  /* Gradient fade overlay */
+  .fade-overlay {
+    position: absolute;
+    bottom: 56px;
+    left: 0;
+    right: 0;
+    height: 140px;
+    background: linear-gradient(
+      to top,
+      var(--color-bg, #fdfbf7) 0%,
+      var(--color-bg, #fdfbf7) 20%,
+      transparent 100%
+    );
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  /* Hide overlay when expanded */
+  .posts-container:not(.is-collapsed) .fade-overlay {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Show All button container */
+  .show-all-container {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0 0.5rem;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  /* Hide button when expanded */
+  .posts-container:not(.is-collapsed) .show-all-container {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* Show All text button */
+  .show-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: 1px solid var(--color-border-light, #e5e7eb);
+    border-radius: 2rem;
+    font-family: var(--font-sans, 'Outfit', sans-serif);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-text-medium, #475569);
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .show-all-btn:hover {
+    color: var(--color-accent, #3b82f6);
+    border-color: var(--color-accent, #3b82f6);
+    background: rgba(59, 130, 246, 0.04);
+  }
+
+  .show-all-btn:focus-visible {
+    outline: 2px solid var(--color-accent, #3b82f6);
+    outline-offset: 2px;
+  }
+
+  .show-all-btn .arrow-icon {
+    transition: transform 0.25s ease;
+  }
+
+  .show-all-btn:hover .arrow-icon {
+    transform: translateX(4px);
+  }
+
   /* Mobile: stack into cards */
   @media (max-width: 640px) {
+    .posts-container.is-collapsed .post-list {
+      max-height: 520px;
+    }
+
     .post-item {
       grid-template-columns: 1fr;
       gap: 0.4rem;
@@ -111,6 +249,10 @@ function formatDate(date: Date): string {
 
     .post-read-time {
       order: 3;
+    }
+
+    .fade-overlay {
+      height: 100px;
     }
   }
 

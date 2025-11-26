@@ -27,7 +27,13 @@
     background: var(--color-accent, #e5fc81);
     transform-origin: left center;
     transform: scaleX(0);
-    transition: transform 0.18s ease-out;
+    transition: transform 0.1s linear;
+    will-change: transform;
+  }
+
+  /* Smooth transition when content size changes significantly */
+  .scroll-progress__bar.is-adjusting {
+    transition: transform 0.4s cubic-bezier(0.2, 0, 0.2, 1);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -38,8 +44,10 @@
 </style>
 
 <script>
-  if (typeof window !== 'undefined') {
-    const bar = document.querySelector('[data-scroll-progress] .scroll-progress__bar');
+  if (typeof window !== "undefined") {
+    const bar = document.querySelector(
+      "[data-scroll-progress] .scroll-progress__bar",
+    );
 
     if (bar instanceof HTMLElement) {
       const update = () => {
@@ -57,12 +65,40 @@
         });
       };
 
-      window.addEventListener('scroll', scheduleUpdate, { passive: true });
-      window.addEventListener('resize', scheduleUpdate);
+      window.addEventListener("scroll", scheduleUpdate, { passive: true });
+      window.addEventListener("resize", scheduleUpdate);
+
+      // Monitor content height changes
+      let lastScrollHeight = document.documentElement.scrollHeight;
+
+      const resizeObserver = new ResizeObserver(() => {
+        const currentScrollHeight = document.documentElement.scrollHeight;
+
+        // If height changed significantly (more than 100px), animate the change
+        if (Math.abs(currentScrollHeight - lastScrollHeight) > 100) {
+          bar.classList.add("is-adjusting");
+          update();
+
+          // Remove class after transition
+          setTimeout(() => {
+            bar.classList.remove("is-adjusting");
+          }, 400);
+        } else {
+          update();
+        }
+
+        lastScrollHeight = currentScrollHeight;
+      });
+
+      resizeObserver.observe(document.body);
+
       update();
 
-      document.addEventListener('astro:after-swap', scheduleUpdate);
-      document.addEventListener('astro:page-load', scheduleUpdate);
+      document.addEventListener("astro:after-swap", () => {
+        scheduleUpdate();
+        resizeObserver.observe(document.body);
+      });
+      document.addEventListener("astro:page-load", scheduleUpdate);
     }
   }
 </script>

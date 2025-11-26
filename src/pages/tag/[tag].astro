@@ -1,81 +1,75 @@
 ---
-import { getCollection } from 'astro:content';
-import SEO from '../../components/SEO.astro';
-import ScrollProgress from '../../components/ScrollProgress.astro';
-import MinimalNav from '../../components/MinimalNav.astro';
-import Footer from '../../components/Footer.astro';
-import PostListTable from '../../components/PostListTable.astro';
-import '../../styles/global.css';
+import { getCollection } from "astro:content";
+import SEO from "../../components/SEO.astro";
+import ScrollProgress from "../../components/ScrollProgress.astro";
+import MinimalNav from "../../components/MinimalNav.astro";
+import Footer from "../../components/Footer.astro";
+import PostListTable from "../../components/PostListTable.astro";
+import "../../styles/global.css";
+import ThemeScript from "../../components/ThemeScript.astro";
 
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
   const tags = new Set<string>();
   for (const p of posts) {
     for (const t of p.data.tags) {
-      if (!t.toLowerCase().startsWith('hash-')) tags.add(t);
+      if (!t.toLowerCase().startsWith("hash-")) tags.add(t);
     }
   }
   return Array.from(tags).map((tag) => ({ params: { tag } }));
 }
 
 const currentTag = decodeURIComponent(Astro.params.tag!);
-const posts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = await getCollection("blog", ({ data }) => !data.draft);
 const filteredPosts = posts
   .filter((p) =>
-    p.data.tags.some((t) =>
-      !t.toLowerCase().startsWith('hash-') &&
-      t.toLowerCase() === currentTag.toLowerCase()
-    )
+    p.data.tags.some(
+      (t) =>
+        !t.toLowerCase().startsWith("hash-") &&
+        t.toLowerCase() === currentTag.toLowerCase(),
+    ),
   )
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <SEO
-    title={`#${currentTag} | Tags | Neurohackingly`}
-    description={`Articles tagged "${currentTag}"`}
-    category="blog"
-    tags={[currentTag]}
-  />
-  <script is:inline>
-    const getTheme = () => localStorage.getItem('theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  <head>
+    <SEO
+      title={`#${currentTag} | Tags | Neurohackingly`}
+      description={`Articles tagged "${currentTag}"`}
+      category="blog"
+      tags={[currentTag]}
+    />
+    <ThemeScript />
+  </head>
+  <body>
+    <ScrollProgress />
+    <MinimalNav />
 
-    document.documentElement.setAttribute('data-theme', getTheme());
+    <main>
+      <header class="tag-header">
+        <h1>#{currentTag}</h1>
+        <p>
+          {filteredPosts.length} article{filteredPosts.length === 1 ? "" : "s"}
+        </p>
+      </header>
 
-    window.toggleTheme = () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    };
-  </script>
-</head>
-<body>
-  <ScrollProgress />
-  <MinimalNav />
+      <section class="posts-section">
+        {
+          filteredPosts.length === 0 ? (
+            <p class="no-posts">No posts found for this tag.</p>
+          ) : (
+            <PostListTable posts={filteredPosts} />
+          )
+        }
+      </section>
+    </main>
 
-  <main>
-    <header class="tag-header">
-      <h1>#{currentTag}</h1>
-      <p>{filteredPosts.length} article{filteredPosts.length === 1 ? '' : 's'}</p>
-    </header>
-
-    <section class="posts-section">
-      {filteredPosts.length === 0 ? (
-        <p class="no-posts">No posts found for this tag.</p>
-      ) : (
-        <PostListTable posts={filteredPosts} />
-      )}
-    </section>
-  </main>
-
-  <Footer />
-</body>
+    <Footer />
+  </body>
 </html>
 
 <style>

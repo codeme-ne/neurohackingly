@@ -1,11 +1,14 @@
 ---
-import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
-import SEO from '../components/SEO.astro';
-import ScrollProgress from '../components/ScrollProgress.astro';
-import MinimalNav from '../components/MinimalNav.astro';
-import Footer from '../components/Footer.astro';
-import '../styles/global.css';
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import SEO from "../components/SEO.astro";
+import ScrollProgress from "../components/ScrollProgress.astro";
+import MinimalNav from "../components/MinimalNav.astro";
+import Footer from "../components/Footer.astro";
+import "../styles/global.css";
+import ThemeScript from "../components/ThemeScript.astro";
+import TableOfContents from "../components/TableOfContents.astro";
+import type { MarkdownHeading } from "astro";
 
 interface Props {
   title: string;
@@ -18,6 +21,7 @@ interface Props {
   tags?: string[];
   readingTime?: number;
   topics?: string[];
+  headings?: MarkdownHeading[];
 }
 
 const {
@@ -30,7 +34,8 @@ const {
   hero,
   tags = [],
   readingTime: frontmatterReadingTime,
-  topics = []
+  topics = [],
+  headings = [],
 } = Astro.props;
 
 // Trust Zod schema - dates are already validated
@@ -38,159 +43,185 @@ const pubDate = rawPubDate;
 const updatedDate = rawUpdatedDate;
 
 if (!pubDate) {
-  throw new Error('BlogPost layout requires a pubDate for blog content.');
+  throw new Error("BlogPost layout requires a pubDate for blog content.");
 }
 
 // Reading time calculation
 const WORDS_PER_MINUTE = 200;
-const content = await Astro.slots.render('default');
+const content = await Astro.slots.render("default");
 const wordCount = content.split(/\s+/).length;
 const computedReadingTime = Math.ceil(wordCount / WORDS_PER_MINUTE);
-const readingMinutes = typeof frontmatterReadingTime === 'number' && frontmatterReadingTime > 0
-  ? Math.round(frontmatterReadingTime)
-  : computedReadingTime;
+const readingMinutes =
+  typeof frontmatterReadingTime === "number" && frontmatterReadingTime > 0
+    ? Math.round(frontmatterReadingTime)
+    : computedReadingTime;
 
-const isGerman = Astro.url.pathname.startsWith('/de');
-const locale = isGerman ? 'de-DE' : 'en-US';
+const isGerman = Astro.url.pathname.startsWith("/de");
+const locale = isGerman ? "de-DE" : "en-US";
 
 const authorSocials = {
-  twitter: '@neurohackingly',
-  linkedin: 'https://www.linkedin.com/in/lukzan',
-  github: 'https://github.com/codeme-ne',
-  website: 'https://neurohackingly.com'
+  twitter: "@neurohackingly",
+  linkedin: "https://www.linkedin.com/in/lukzan",
+  github: "https://github.com/codeme-ne",
+  website: "https://neurohackingly.com",
 };
 
-const authorSameAs = Array.from(new Set([
-  authorSocials.twitter ? `https://twitter.com/${authorSocials.twitter.replace('@', '')}` : undefined,
-  authorSocials.linkedin,
-  authorSocials.github,
-  authorSocials.website
-].filter(Boolean)));
+const authorSameAs = Array.from(
+  new Set(
+    [
+      authorSocials.twitter
+        ? `https://twitter.com/${authorSocials.twitter.replace("@", "")}`
+        : undefined,
+      authorSocials.linkedin,
+      authorSocials.github,
+      authorSocials.website,
+    ].filter(Boolean),
+  ),
+);
 
 const mergedTags = Array.from(new Set([...tags, ...topics]));
-const baseCategory = topics[0] ?? tags[0] ?? 'blog';
+const baseCategory = topics[0] ?? tags[0] ?? "blog";
 const primaryTopic = baseCategory.toLowerCase();
 const timeRequired = `PT${Math.max(1, readingMinutes)}M`;
 const publisherLogo = Astro.site
-  ? new URL('/images/og/default.svg', Astro.site).href
-  : 'https://neurohackingly.com/images/og/default.svg';
+  ? new URL("/images/og/default.svg", Astro.site).href
+  : "https://neurohackingly.com/images/og/default.svg";
 
 // Schema.org structured data
 const effectiveModifiedDate = updatedDate ?? pubDate;
 
 const schema = {
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
   headline: title,
   description,
   image: image?.url,
   ...(pubDate && { datePublished: pubDate.toISOString() }),
-  ...(effectiveModifiedDate && { dateModified: effectiveModifiedDate.toISOString() }),
+  ...(effectiveModifiedDate && {
+    dateModified: effectiveModifiedDate.toISOString(),
+  }),
   inLanguage: locale,
   timeRequired,
   wordCount,
-  ...(mergedTags.length > 0 && { keywords: mergedTags.join(', ') }),
+  ...(mergedTags.length > 0 && { keywords: mergedTags.join(", ") }),
   ...(topics.length > 0 && {
-    about: topics.map(topic => ({
-      '@type': 'Thing',
-      name: topic
-    }))
+    about: topics.map((topic) => ({
+      "@type": "Thing",
+      name: topic,
+    })),
   }),
   ...(primaryTopic && { articleSection: primaryTopic }),
   author: {
-    '@type': 'Person',
+    "@type": "Person",
     name: author,
     url: authorSocials.website,
-    sameAs: authorSameAs
+    sameAs: authorSameAs,
   },
   publisher: {
-    '@type': 'Organization',
-    name: 'Neurohackingly',
+    "@type": "Organization",
+    name: "Neurohackingly",
     logo: {
-      '@type': 'ImageObject',
-      url: publisherLogo
-    }
-  }
+      "@type": "ImageObject",
+      url: publisherLogo,
+    },
+  },
 };
 ---
 
-<!DOCTYPE html>
-<html lang={isGerman ? 'de' : 'en'}>
-<head>
-  <SEO
-    title={`${title} | Neurohackingly`}
-    description={description}
-    image={image?.url}
-    imageAlt={image?.alt}
-    article={true}
-    publishedTime={pubDate}
-    modifiedTime={updatedDate}
-    tags={mergedTags}
-    category={primaryTopic}
-    authorSocials={authorSocials}
-    structuredData={[schema]}
-  />
-  <script is:inline>
-    const getTheme = () => localStorage.getItem('theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+<!doctype html>
+<html lang={isGerman ? "de" : "en"}>
+  <head>
+    <SEO
+      title={`${title} | Neurohackingly`}
+      description={description}
+      image={image?.url}
+      imageAlt={image?.alt}
+      article={true}
+      publishedTime={pubDate}
+      modifiedTime={updatedDate}
+      tags={mergedTags}
+      category={primaryTopic}
+      authorSocials={authorSocials}
+      structuredData={[schema]}
+    />
+    <ThemeScript />
+  </head>
+  <body>
+    <ScrollProgress />
+    <MinimalNav />
 
-    document.documentElement.setAttribute('data-theme', getTheme());
-
-    window.toggleTheme = () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    };
-  </script>
-</head>
-<body>
-  <ScrollProgress />
-  <MinimalNav />
-
-  <main>
-    <article data-pagefind-body>
-      <header data-pagefind-ignore>
-        {hero ? (
-          <Image
-            src={hero}
-            alt={image?.alt ?? ''}
-            widths={[720, 1024, 1440]}
-            sizes="(max-width: 720px) 100vw, 720px"
-            class="feature-image"
-            loading="eager"
-            decoding="async"
-          />
-        ) : image && (
-          <img src={image.url} alt={image.alt} class="feature-image" loading="eager" decoding="async" />
-        )}
-        <h1 data-pagefind-meta="title">{title}</h1>
-        <div class="meta" data-pagefind-meta="date[content]" content={pubDate.toISOString()}>
-          <time datetime={pubDate.toISOString()}>
-            {pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </time>
-          <span>·</span>
-          <span>{readingMinutes} min read</span>
-          <span>·</span>
-          <span>{author}</span>
-        </div>
-        {tags.length > 0 && (
-          <div class="tags" data-pagefind-meta="tags[content]" content={tags.join(', ')}>
-            {tags
-              .filter(t => !t.toLowerCase().startsWith('hash-'))
-              .map(tag => (
-                <a href={`/tag/${encodeURIComponent(tag)}`} class="tag">#{tag}</a>
-              ))}
+    <main>
+      <article data-pagefind-body>
+        <header data-pagefind-ignore>
+          {
+            hero ? (
+              <Image
+                src={hero}
+                alt={image?.alt ?? ""}
+                widths={[720, 1024, 1440]}
+                sizes="(max-width: 720px) 100vw, 720px"
+                class="feature-image"
+                loading="eager"
+                decoding="async"
+              />
+            ) : (
+              image && (
+                <img
+                  src={image.url}
+                  alt={image.alt}
+                  class="feature-image"
+                  loading="eager"
+                  decoding="async"
+                />
+              )
+            )
+          }
+          <h1 data-pagefind-meta="title">{title}</h1>
+          <div
+            class="meta"
+            data-pagefind-meta="date[content]"
+            content={pubDate.toISOString()}
+          >
+            <time datetime={pubDate.toISOString()}>
+              {
+                pubDate.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+              }
+            </time>
+            <span>·</span>
+            <span>{readingMinutes} min read</span>
+            <span>·</span>
+            <span>{author}</span>
           </div>
-        )}
-      </header>
+          {
+            tags.length > 0 && (
+              <div
+                class="tags"
+                data-pagefind-meta="tags[content]"
+                content={tags.join(", ")}
+              >
+                {tags
+                  .filter((t) => !t.toLowerCase().startsWith("hash-"))
+                  .map((tag) => (
+                    <a href={`/tag/${encodeURIComponent(tag)}`} class="tag">
+                      #{tag}
+                    </a>
+                  ))}
+              </div>
+            )
+          }
+        </header>
 
-      <div class="content">
-        <slot />
-      </div>
-    </article>
+        <div class="content">
+          <slot />
+        </div>
+      </article>
 
-    <Footer />
-  </main>
-</body>
+      <TableOfContents headings={headings} />
+      <Footer />
+    </main>
+  </body>
 </html>

@@ -1,65 +1,59 @@
 ---
-import SEO from '../components/SEO.astro';
-import ScrollProgress from '../components/ScrollProgress.astro';
-import MinimalNav from '../components/MinimalNav.astro';
-import Footer from '../components/Footer.astro';
-import { getCollection } from 'astro:content';
-import PostListTable from '../components/PostListTable.astro';
-import NewsletterSignup from '../components/NewsletterSignup.astro';
-import '../styles/global.css';
+import SEO from "../components/SEO.astro";
+import ScrollProgress from "../components/ScrollProgress.astro";
+import MinimalNav from "../components/MinimalNav.astro";
+import Footer from "../components/Footer.astro";
+import { getCollection } from "astro:content";
+import PostListTable from "../components/PostListTable.astro";
+import NewsletterSignup from "../components/NewsletterSignup.astro";
+import "../styles/global.css";
+import ThemeScript from "../components/ThemeScript.astro";
 
 // Fetch all non-draft posts, sorted by date descending
-const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-const sortedPosts = allPosts.sort((a, b) =>
-  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+const sortedPosts = allPosts.sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <SEO
-    title="Neurohackingly - Productivity, AI & Neuroscience"
-    description="Practical strategies and insights on productivity, AI, and personal growth by Lukas Zangerl"
-    category="home"
-  />
-  <script is:inline>
-    const getTheme = () => localStorage.getItem('theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  <head>
+    <SEO
+      title="Neurohackingly - Productivity, AI & Neuroscience"
+      description="Practical strategies and insights on productivity, AI, and personal growth by Lukas Zangerl"
+      category="home"
+    />
+    <ThemeScript />
+  </head>
+  <body>
+    <ScrollProgress />
+    <MinimalNav />
 
-    document.documentElement.setAttribute('data-theme', getTheme());
+    <main>
+      <header class="hero">
+        <div class="hero-inner">
+          <h1>Neurohackingly</h1>
+          <p class="tagline">Upgrade your brain, mind, and body</p>
+          <p class="subtitle">
+            Practical strategies for productivity, AI, and personal growth
+          </p>
 
-    window.toggleTheme = () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    };
-  </script>
-</head>
-<body>
-  <ScrollProgress />
-  <MinimalNav />
+          <NewsletterSignup
+            source="home-hero"
+            id="hero-email"
+            ariaLabel="Join the newsletter"
+          />
+        </div>
+      </header>
 
-  <main>
-    <header class="hero">
-      <div class="hero-inner">
-        <h1>Neurohackingly</h1>
-        <p class="tagline">Upgrade your brain, mind, and body</p>
-        <p class="subtitle">Practical strategies for productivity, AI, and personal growth</p>
+      <section class="posts-section">
+        <PostListTable posts={sortedPosts} />
+      </section>
+    </main>
 
-        <NewsletterSignup source="home-hero" id="hero-email" ariaLabel="Join the newsletter" />
-      </div>
-    </header>
-
-    <section class="posts-section">
-      <PostListTable posts={sortedPosts} />
-    </section>
-
-  </main>
-
-  <Footer />
-</body>
+    <Footer />
+  </body>
 </html>
 
 <style>
@@ -78,5 +72,4 @@ const sortedPosts = allPosts.sort((a, b) =>
       padding-inline: 1rem;
     }
   }
-  
 </style>
