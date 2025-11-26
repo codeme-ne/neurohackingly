@@ -4,10 +4,12 @@ import ScrollProgress from "../components/ScrollProgress.astro";
 import MinimalNav from "../components/MinimalNav.astro";
 import Footer from "../components/Footer.astro";
 import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
 import PostListTable from "../components/PostListTable.astro";
 import NewsletterSignup from "../components/NewsletterSignup.astro";
 import "../styles/global.css";
 import ThemeScript from "../components/ThemeScript.astro";
+import heroPhoto from "../assets/heroes/home/Lukas_Zangerl_Neurohackingly.jpeg";
 
 // Fetch all non-draft posts, sorted by date descending
 const allPosts = await getCollection("blog", ({ data }) => !data.draft);
@@ -32,23 +34,38 @@ const sortedPosts = allPosts.sort(
 
     <main>
       <header class="hero">
-        <div class="hero-inner">
-          <h1>Neurohackingly</h1>
-          <p class="tagline">Upgrade your brain, mind, and body</p>
-          <p class="subtitle">
-            Practical strategies for productivity, AI, and personal growth
-          </p>
-
-          <NewsletterSignup
-            source="home-hero"
-            id="hero-email"
-            ariaLabel="Join the newsletter"
-          />
+        <div class="hero-grid">
+          <div class="hero-content">
+            <span class="tagline">Upgrade your brain, mind, and body</span>
+            <h1>Neurohackingly</h1>
+            <p class="subtitle">
+              Practical strategies for productivity, AI, and personal growth
+            </p>
+            <div class="hero-cta">
+              <NewsletterSignup
+                source="home-hero"
+                id="hero-email"
+                ariaLabel="Join the newsletter"
+              />
+            </div>
+          </div>
+          <div class="hero-visual">
+            <div class="hero-image-wrapper">
+              <Image
+                src={heroPhoto}
+                alt="Lukas Zangerl"
+                class="hero-image"
+                width={400}
+                height={400}
+                loading="eager"
+              />
+            </div>
+          </div>
         </div>
       </header>
 
       <section class="posts-section">
-        <PostListTable posts={sortedPosts} />
+        <PostListTable posts={sortedPosts} showMoreButton={true} />
       </section>
     </main>
 
@@ -57,19 +74,8 @@ const sortedPosts = allPosts.sort(
 </html>
 
 <style>
-  .hero-inner {
-    max-width: 720px;
-    margin: 0 auto;
-  }
-
   .posts-section {
     margin-top: var(--space-xl);
     margin-bottom: var(--space-2xl);
-  }
-
-  @media (max-width: 640px) {
-    .hero-inner {
-      padding-inline: 1rem;
-    }
   }
 </style>

@@ -6,9 +6,9 @@ const entry = await getEntry('blog', 'now');
 if (!entry) {
   throw new Error('Entry "now" not found');
 }
-const { Content } = await entry.render();
+const { Content, headings } = await entry.render();
 ---
 
-<BlogPost {...entry.data}>
+<BlogPost {...entry.data} headings={headings}>
   <Content />
 </BlogPost>

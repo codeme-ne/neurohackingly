@@ -1,0 +1,91 @@
+PROTOTYPE 2: EDITORIAL MAGAZINE LAYOUT
+════════════════════════════════════════════════════════════════════════════════
+
+DESKTOP LAYOUT (~1200px):
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│ ┌────────────────────────┐  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ │                        │  ┃ NEUROHACKINGLY                             ┃ │
+│ │                        │  ┃                                            ┃ │
+│ │       PHOTO            │  ┃ Upgrade your brain,                        ┃ │
+│ │       LUKAS            │  ┃ mind, and body                             ┃ │
+│ │       ZANGERL          │  ┃                                            ┃ │
+│ │                        │  ┃ Practical strategies for productivity,     ┃ │
+│ │   Full bleed image     │  ┃ AI, and personal growth. Join 10,000+      ┃ │
+│ │   from edge to edge    │  ┃ readers optimizing their performance.      ┃ │
+│ │                        │  ┃                                            ┃ │
+│ │                        │  ┃                                            ┃ │
+│ │                        │  ┃ ┌──────────────────────────┐               ┃ │
+│ │                        │  ┃ │  Email Address      [→]  │               ┃ │
+│ │                        │  ┃ └──────────────────────────┘               ┃ │
+│ │                        │  ┃                                            ┃ │
+│ │                        │  ┃ ↓ Latest from the blog                     ┃ │
+│ │                        │  ┃                                            ┃ │
+│ │                        │  ┃ • How AI Tools Changed My Workflow         ┃ │
+│ │                        │  ┃ • Neuroscience of Deep Work                ┃ │
+│ │                        │  ┃ • Building Better Habits                   ┃ │
+│ └────────────────────────┘  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+MOBILE LAYOUT (~375px):
+┌──────────────────────┐
+│                      │
+│  ┌────────────────┐  │
+│  │                │  │
+│  │     PHOTO      │  │
+│  │     LUKAS      │  │
+│  │    ZANGERL     │  │
+│  │                │  │
+│  │  Full width    │  │
+│  │  hero image    │  │
+│  │                │  │
+│  └────────────────┘  │
+│                      │
+│ ┏━━━━━━━━━━━━━━━━━┓ │
+│ ┃NEUROHACKINGLY   ┃ │
+│ ┃                 ┃ │
+│ ┃Upgrade your     ┃ │
+│ ┃brain, mind,     ┃ │
+│ ┃and body         ┃ │
+│ ┃                 ┃ │
+│ ┃Practical strat- ┃ │
+│ ┃egies for prod-  ┃ │
+│ ┃uctivity, AI,    ┃ │
+│ ┃and growth.      ┃ │
+│ ┃                 ┃ │
+│ ┃┌───────────────┐┃ │
+│ ┃│ Email    [→]  │┃ │
+│ ┃└───────────────┘┃ │
+│ ┃                 ┃ │
+│ ┃Latest posts:    ┃ │
+│ ┃• AI Workflow    ┃ │
+│ ┃• Deep Work      ┃ │
+│ ┃• Habits         ┃ │
+│ ┗━━━━━━━━━━━━━━━━━┛ │
+│                      │
+└──────────────────────┘
+
+DESIGN RATIONALE:
+Magazine-style layout with large hero image on left (40% width) and content
+card on right (60%). The photo becomes a statement piece, not just decoration.
+Latest posts preview provides immediate value and encourages scroll.
+
+KEY CSS CONCEPTS:
+- Grid: `grid-template-columns: 2fr 3fr` on desktop
+- Photo: full-bleed with `object-fit: cover`, slight grayscale filter
+- Content card: subtle background (--bg-elevated), padding: 3rem
+- Typography: larger sizes, editorial leading (line-height: 1.7)
+- Optional: parallax scroll effect on photo
+
+PROS:
+✓ High-impact visual presence (photo is hero element)
+✓ Professional, authoritative aesthetic
+✓ Content preview adds value immediately
+✓ Leverages horizontal space well
+
+CONS:
+✗ Photo quality becomes critical (needs professional headshot)
+✗ More complex responsive breakpoints
+✗ Risk of feeling corporate/impersonal if not executed well
+✗ Large image may slow initial load

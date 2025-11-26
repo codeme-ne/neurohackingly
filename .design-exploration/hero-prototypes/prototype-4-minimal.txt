@@ -1,0 +1,98 @@
+PROTOTYPE 4: ULTRA MINIMAL / BRUTALIST
+════════════════════════════════════════════════════════════════════════════════
+
+DESKTOP LAYOUT (~1200px):
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│                                                                              │
+│  NEUROHACKINGLY                                                              │
+│  ───────────────────────────────────────────                                │
+│  Lukas Zangerl                                                    [○]        │
+│                                                                   74×74      │
+│                                                                              │
+│                                                                              │
+│  Upgrade your brain, mind, and body.                                        │
+│                                                                              │
+│  → Weekly strategies for productivity, AI, and personal growth               │
+│  → No fluff. Just actionable insights.                                      │
+│  → Join 10,000+ readers                                                     │
+│                                                                              │
+│                                                                              │
+│  your@email.com _________________________________ [Subscribe]                │
+│                                                                              │
+│                                                                              │
+│  ↓ Start reading                                                            │
+│                                                                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+MOBILE LAYOUT (~375px):
+┌──────────────────────┐
+│                      │
+│ NEUROHACKINGLY       │
+│ ──────────────────   │
+│ Lukas Zangerl   [○]  │
+│                      │
+│                      │
+│ Upgrade your brain,  │
+│ mind, and body.      │
+│                      │
+│ → Weekly strategies  │
+│   for productivity,  │
+│   AI, and growth     │
+│                      │
+│ → No fluff. Just     │
+│   actionable         │
+│   insights.          │
+│                      │
+│ → Join 10,000+       │
+│   readers            │
+│                      │
+│                      │
+│ your@email.com       │
+│ ──────────────────── │
+│                      │
+│ [Subscribe]          │
+│                      │
+│                      │
+│ ↓ Start reading      │
+│                      │
+│                      │
+└──────────────────────┘
+
+DESIGN RATIONALE:
+Stripped-down, text-focused design that prioritizes message over decoration.
+Small circular photo (74px) acts as brand marker, not hero element. Generous
+whitespace and typography do all the heavy lifting. Brutalist/utilitarian aesthetic.
+
+KEY CSS CONCEPTS:
+- Single column layout (max-width: 640px, margin: 0 auto)
+- Massive vertical spacing (padding: 6rem 0)
+- Typography scale: H1 (48px), body (20px), generous line-height (1.8)
+- Minimal decorative elements: simple underline, arrow symbols
+- Photo: tiny circle (74px), positioned top-right or inline with name
+- Input field: borderless with bottom border only
+
+PROS:
+✓ Fast load, minimal assets required
+✓ Maximum focus on message and value proposition
+✓ Timeless aesthetic (won't look dated)
+✓ Accessibility-first (relies on semantic HTML and clear hierarchy)
+✓ Easy to maintain and iterate
+
+CONS:
+✗ Low visual impact (may not grab attention)
+✗ Requires exceptional copywriting to compensate for lack of visuals
+✗ Photo becomes almost invisible (good or bad depending on goal)
+✗ May feel cold/impersonal if not paired with warm, conversational copy
+✗ Doesn't leverage full visual potential of web medium
+
+ALTERNATIVE VARIATION:
+Replace small photo with text-only brand:
+
+  NEUROHACKINGLY
+  ───────────────────────────────────────────
+  by Lukas Zangerl
+
+This removes the photo entirely and commits fully to text-based branding.
+Photo could appear later in "About" section or sidebar.

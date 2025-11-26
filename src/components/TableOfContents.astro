@@ -7,181 +7,262 @@ interface Props {
 
 const { headings } = Astro.props;
 
-// Filter out h1 (title) and limit depth if needed
+// Filter out h1 (title) and limit depth
 const tocHeadings = headings.filter(
-    (heading) => heading.depth > 1 && heading.depth <= 3,
+    (heading) => heading.depth > 1 && heading.depth <= 4,
 );
 ---
 
-<nav class="toc-container" aria-label="Table of Contents">
-    <div class="toc-trigger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-    <div class="toc-content">
-        <div class="toc-header">In this article</div>
-        <ul class="toc-list">
-            {
-                tocHeadings.map((heading) => (
+{tocHeadings.length > 0 && (
+    <nav class="toc" aria-label="Table of Contents">
+        <!-- Minimalist line indicator (always visible on desktop) -->
+        <div class="toc-lines">
+            {tocHeadings.map((heading, index) => (
+                <a
+                    href={`#${heading.slug}`}
+                    class={`toc-line depth-${heading.depth}`}
+                    data-index={index}
+                    aria-label={heading.text}
+                >
+                    <span class="line"></span>
+                </a>
+            ))}
+        </div>
+
+        <!-- Expanded panel (shows on hover/tap) -->
+        <div class="toc-panel">
+            <div class="toc-panel-header">Contents</div>
+            <ul class="toc-list">
+                {tocHeadings.map((heading, index) => (
                     <li class={`toc-item depth-${heading.depth}`}>
-                        <a href={`#${heading.slug}`} class="toc-link">
+                        <a
+                            href={`#${heading.slug}`}
+                            class="toc-link"
+                            data-index={index}
+                        >
                             {heading.text}
                         </a>
                     </li>
-                ))
-            }
-        </ul>
-    </div>
-</nav>
+                ))}
+            </ul>
+        </div>
+
+        <!-- Mobile floating button -->
+        <button class="toc-fab" aria-label="Show table of contents">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="15" y2="12"></line>
+                <line x1="3" y1="18" x2="9" y2="18"></line>
+            </svg>
+        </button>
+
+        <!-- Mobile overlay -->
+        <div class="toc-overlay"></div>
+    </nav>
+)}
 
 <script>
-    // Client-side logic for highlighting active section
-    const observerOptions = {
-        root: null,
-        rootMargin: "-100px 0px -66%",
-        threshold: 1.0,
-    };
+    function initTOC() {
+        const toc = document.querySelector('.toc');
+        if (!toc) return;
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            const id = entry.target.getAttribute("id");
-            const tocLink = document.querySelector(`.toc-link[href="#${id}"]`);
+        const lines = toc.querySelectorAll('.toc-line');
+        const links = toc.querySelectorAll('.toc-link');
+        const fab = toc.querySelector('.toc-fab');
+        const panel = toc.querySelector('.toc-panel');
+        const overlay = toc.querySelector('.toc-overlay');
 
-            if (entry.isIntersecting) {
-                document
-                    .querySelectorAll(".toc-link")
-                    .forEach((link) => link.classList.remove("active"));
-                if (tocLink) {
-                    tocLink.classList.add("active");
+        let isScrollingFromClick = false;
+        let activeIndex = 0;
+
+        // Intersection Observer for active section
+        const observerOptions = {
+            root: null,
+            rootMargin: "-80px 0px -70%",
+            threshold: 0,
+        };
+
+        const headings = document.querySelectorAll("h2[id], h3[id], h4[id]");
+        const headingMap = new Map();
+
+        headings.forEach((heading, index) => {
+            headingMap.set(heading.id, index);
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            if (isScrollingFromClick) return;
+
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute("id");
+                    const index = headingMap.get(id);
+                    if (index !== undefined) {
+                        setActive(index);
+                    }
                 }
+            });
+        }, observerOptions);
+
+        headings.forEach((heading) => observer.observe(heading));
+
+        function setActive(index: number) {
+            activeIndex = index;
+
+            // Update lines
+            lines.forEach((line, i) => {
+                line.classList.toggle('active', i === index);
+            });
+
+            // Update links
+            links.forEach((link, i) => {
+                link.classList.toggle('active', i === index);
+            });
+        }
+
+        // Click handlers for lines and links
+        [...lines, ...links].forEach((el) => {
+            el.addEventListener('click', (e) => {
+                const index = parseInt(el.getAttribute('data-index') || '0');
+                setActive(index);
+
+                isScrollingFromClick = true;
+                setTimeout(() => {
+                    isScrollingFromClick = false;
+                }, 1000);
+
+                // Close mobile panel
+                toc.classList.remove('mobile-open');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Mobile FAB toggle
+        fab?.addEventListener('click', () => {
+            toc.classList.toggle('mobile-open');
+            document.body.style.overflow = toc.classList.contains('mobile-open') ? 'hidden' : '';
+        });
+
+        // Close on overlay click
+        overlay?.addEventListener('click', () => {
+            toc.classList.remove('mobile-open');
+            document.body.style.overflow = '';
+        });
+
+        // Close on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && toc.classList.contains('mobile-open')) {
+                toc.classList.remove('mobile-open');
+                document.body.style.overflow = '';
             }
         });
-    }, observerOptions);
 
-    // Track all headings
-    document.querySelectorAll("h2, h3").forEach((heading) => {
-        observer.observe(heading);
-    });
+        // Initialize first active
+        setActive(0);
+    }
 
-    // Prevent body scroll when scrolling inside TOC if it's not scrollable
-    const tocContents = document.querySelectorAll(".toc-content");
-    tocContents.forEach((tocContent) => {
-        tocContent.addEventListener(
-            "wheel",
-            (e) => {
-                const isScrollable =
-                    tocContent.scrollHeight > tocContent.clientHeight;
-                if (!isScrollable) {
-                    e.preventDefault();
-                }
-            },
-            { passive: false },
-        );
-    });
+    initTOC();
+    document.addEventListener('astro:page-load', initTOC);
 </script>
 
 <style>
-    .toc-container {
-        position: fixed;
-        top: 100px;
-        right: 20px;
-        z-index: 100;
-        display: none; /* Hidden on mobile by default */
+    .toc {
+        --toc-line-color: var(--color-border);
+        --toc-line-active: var(--color-accent);
+        --toc-line-hover: var(--color-text-light);
     }
 
-    @media (min-width: 1200px) {
-        .toc-container {
-            display: block;
+    /* ===== DESKTOP: Line Indicators ===== */
+    .toc-lines {
+        position: fixed;
+        top: 50%;
+        right: 24px;
+        transform: translateY(-50%);
+        display: none;
+        flex-direction: column;
+        gap: 6px;
+        padding: 12px 8px;
+        z-index: 100;
+    }
+
+    @media (min-width: 1100px) {
+        .toc-lines {
+            display: flex;
         }
     }
 
-    /* Trigger Icon (Hamburger) */
-    .toc-trigger {
-        width: 32px;
-        height: 32px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 4px;
-        cursor: pointer;
-        padding: 4px;
-        border-radius: 4px;
-        transition: background-color 0.2s ease;
-    }
-
-    .toc-trigger:hover {
-        background-color: rgba(128, 128, 128, 0.1);
-    }
-
-    .toc-trigger span {
+    .toc-line {
         display: block;
-        height: 2px;
-        background-color: var(--color-text-muted, #999);
-        border-radius: 2px;
-        transition:
-            background-color 0.2s ease,
-            width 0.2s ease;
-    }
-
-    /* Varying widths to look like a document/list, not a hamburger menu */
-    .toc-trigger span:nth-child(1) {
-        width: 100%;
-    }
-    .toc-trigger span:nth-child(2) {
-        width: 70%;
-    }
-    .toc-trigger span:nth-child(3) {
-        width: 40%;
-    }
-
-    /* Center the lines */
-    .toc-trigger {
-        align-items: center;
-    }
-
-    .toc-container:hover .toc-trigger span {
-        background-color: var(--color-text-main, #333);
-        width: 100%; /* Expand on hover for effect */
-    }
-
-    /* Content Panel */
-    .toc-content {
-        position: absolute;
-        top: 0;
-        right: 40px; /* Position to the left of the trigger */
-        width: 240px;
-        background: var(
-            --color-bg-body,
-            #1a1a1a
-        ); /* Dark bg as per screenshot */
-        border: 1px solid rgba(128, 128, 128, 0.2);
-        border-radius: 8px;
-        padding: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        opacity: 0;
-        visibility: hidden;
-        transform: translateX(10px);
+        height: 3px;
+        cursor: pointer;
         transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .toc-line .line {
+        display: block;
+        height: 100%;
+        background: var(--toc-line-color);
+        border-radius: 2px;
+        transition: all 0.2s ease;
+    }
+
+    /* Line widths based on depth */
+    .toc-line.depth-2 .line { width: 24px; }
+    .toc-line.depth-3 .line { width: 16px; }
+    .toc-line.depth-4 .line { width: 10px; }
+
+    .toc-line:hover .line {
+        background: var(--toc-line-hover);
+        transform: scaleX(1.2);
+        transform-origin: right;
+    }
+
+    .toc-line.active .line {
+        background: var(--toc-line-active);
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+    }
+
+    /* ===== DESKTOP: Expanded Panel on Hover ===== */
+    .toc-panel {
+        position: fixed;
+        top: 50%;
+        right: 60px;
+        transform: translateY(-50%) translateX(20px);
+        width: 260px;
         max-height: 70vh;
         overflow-y: auto;
-        overscroll-behavior: contain;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.25s ease;
+        z-index: 99;
     }
 
-    /* Show content on hover over container */
-    .toc-container:hover .toc-content {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(0);
+    :global(:root[data-theme="dark"]) .toc-panel {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     }
 
-    .toc-header {
-        font-size: 0.75rem;
+    @media (min-width: 1100px) {
+        .toc-lines:hover + .toc-panel,
+        .toc-panel:hover {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-50%) translateX(0);
+        }
+    }
+
+    .toc-panel-header {
+        font-size: 0.7rem;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--color-text-muted, #888);
-        margin-bottom: 8px;
-        padding-left: 8px;
+        letter-spacing: 0.1em;
+        color: var(--color-text-light);
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--color-border-light);
     }
 
     .toc-list {
@@ -194,58 +275,147 @@ const tocHeadings = headings.filter(
     }
 
     .toc-item {
-        font-size: 0.85rem;
+        font-size: 0.875rem;
         line-height: 1.4;
     }
 
     .toc-link {
         display: block;
-        padding: 6px 8px;
-        color: var(--color-text-muted, #aaa);
+        padding: 8px 10px;
+        color: var(--color-text-light);
         text-decoration: none;
-        border-radius: 4px;
-        transition: all 0.2s ease;
+        border-radius: 6px;
+        transition: all 0.15s ease;
+        border-left: 2px solid transparent;
     }
 
     .toc-link:hover {
-        background-color: rgba(128, 128, 128, 0.1);
-        color: var(--color-text-main, #eee);
+        background: var(--color-bg-light);
+        color: var(--color-text);
     }
 
     .toc-link.active {
-        color: var(--color-primary, #fff);
+        color: var(--color-accent);
+        background: rgba(59, 130, 246, 0.08);
+        border-left-color: var(--color-accent);
         font-weight: 500;
-        background-color: rgba(128, 128, 128, 0.15);
     }
 
     /* Indentation */
-    .depth-3 {
-        padding-left: 12px;
+    .toc-item.depth-3 .toc-link { padding-left: 20px; }
+    .toc-item.depth-4 .toc-link { padding-left: 32px; }
+
+    /* ===== MOBILE/TABLET: FAB + Overlay ===== */
+    .toc-fab {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--color-button-bg);
+        color: var(--color-button-text);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.2s ease;
+        z-index: 101;
     }
 
-    /* Scrollbar for content */
-    .toc-content::-webkit-scrollbar {
+    :global(:root[data-theme="dark"]) .toc-fab {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .toc-fab:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .toc-fab:active {
+        transform: scale(0.95);
+    }
+
+    @media (min-width: 1100px) {
+        .toc-fab {
+            display: none;
+        }
+    }
+
+    .toc-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 100;
+    }
+
+    @media (min-width: 1100px) {
+        .toc-overlay {
+            display: none;
+        }
+    }
+
+    /* Mobile open state */
+    .toc.mobile-open .toc-overlay {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .toc.mobile-open .toc-panel {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-height: 60vh;
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+        border-radius: 20px 20px 0 0;
+        z-index: 102;
+    }
+
+    .toc.mobile-open .toc-fab {
+        transform: rotate(45deg);
+        background: var(--color-text-light);
+    }
+
+    /* iPad specific adjustments */
+    @media (min-width: 768px) and (max-width: 1099px) {
+        .toc-fab {
+            bottom: 32px;
+            right: 32px;
+            width: 56px;
+            height: 56px;
+        }
+
+        .toc.mobile-open .toc-panel {
+            max-height: 50vh;
+            max-width: 400px;
+            left: auto;
+            right: 32px;
+            bottom: 100px;
+            border-radius: 12px;
+        }
+    }
+
+    /* Scrollbar styling */
+    .toc-panel::-webkit-scrollbar {
         width: 4px;
     }
 
-    .toc-content::-webkit-scrollbar-track {
+    .toc-panel::-webkit-scrollbar-track {
         background: transparent;
     }
 
-    .toc-content::-webkit-scrollbar-thumb {
-        background: rgba(128, 128, 128, 0.3);
+    .toc-panel::-webkit-scrollbar-thumb {
+        background: var(--color-border);
         border-radius: 2px;
-    }
-
-    /* Dark mode adjustments if needed, though default styling above is already dark-ish/neutral */
-    :global(.light) .toc-content {
-        background: #fff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    :global(.light) .toc-link {
-        color: #666;
-    }
-    :global(.light) .toc-link:hover {
-        color: #000;
     }
 </style>

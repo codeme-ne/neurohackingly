@@ -8,6 +8,7 @@ import Footer from "../components/Footer.astro";
 import "../styles/global.css";
 import ThemeScript from "../components/ThemeScript.astro";
 import TableOfContents from "../components/TableOfContents.astro";
+import ImageLightbox from "../components/ImageLightbox.astro";
 import type { MarkdownHeading } from "astro";
 
 interface Props {
@@ -223,5 +224,49 @@ const schema = {
       <TableOfContents headings={headings} />
       <Footer />
     </main>
+
+    <ImageLightbox />
+
+    <script>
+      // SVG Icons for copy button
+      const COPY_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+      const CHECK_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+      function initCopyButtons() {
+        const codeBlocks = document.querySelectorAll('article .content pre');
+
+        codeBlocks.forEach((pre) => {
+          if (pre.querySelector('.copy-button')) return;
+
+          const button = document.createElement('button');
+          button.className = 'copy-button';
+          button.innerHTML = COPY_ICON;
+          button.setAttribute('aria-label', 'Copy code to clipboard');
+
+          button.addEventListener('click', async () => {
+            const code = pre.querySelector('code');
+            if (!code) return;
+
+            try {
+              await navigator.clipboard.writeText(code.textContent || '');
+              button.innerHTML = CHECK_ICON;
+              button.classList.add('copied');
+
+              setTimeout(() => {
+                button.innerHTML = COPY_ICON;
+                button.classList.remove('copied');
+              }, 2000);
+            } catch (err) {
+              console.error('Failed to copy:', err);
+            }
+          });
+
+          pre.appendChild(button);
+        });
+      }
+
+      initCopyButtons();
+      document.addEventListener('astro:page-load', initCopyButtons);
+    </script>
   </body>
 </html>

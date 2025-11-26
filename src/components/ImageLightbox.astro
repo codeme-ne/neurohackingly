@@ -1,0 +1,181 @@
+---
+// ImageLightbox component for click-to-enlarge functionality
+---
+
+<div id="image-lightbox" class="lightbox-overlay">
+    <button class="lightbox-close" aria-label="Close lightbox">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+    <img src="" alt="" class="lightbox-image" />
+</div>
+
+<style>
+    .lightbox-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.92);
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        cursor: zoom-out;
+    }
+
+    /* Light theme overlay */
+    :root:not([data-theme="dark"]) .lightbox-overlay {
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    /* Dark theme overlay */
+    :root[data-theme="dark"] .lightbox-overlay {
+        background: rgba(0, 0, 0, 0.92);
+    }
+
+    .lightbox-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .lightbox-image {
+        max-width: 90%;
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: 0.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+        cursor: default;
+    }
+
+    .lightbox-overlay.active .lightbox-image {
+        transform: scale(1);
+    }
+
+    .lightbox-close {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: transparent;
+        border: none;
+        color: var(--color-text-light);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        transition: color 0.2s ease, opacity 0.2s ease;
+        opacity: 0.6;
+        z-index: 10001;
+    }
+
+    .lightbox-close:hover {
+        opacity: 1;
+        color: var(--color-text);
+    }
+
+    .lightbox-close:active {
+        opacity: 0.8;
+    }
+
+    /* Make blog post images clickable - NO hover animation */
+    :global(article .content img) {
+        cursor: zoom-in;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 809px) {
+        .lightbox-image {
+            max-width: 95%;
+            max-height: 85vh;
+        }
+
+        .lightbox-close {
+            top: 1rem;
+            right: 1rem;
+        }
+    }
+</style>
+
+<script>
+    // Image lightbox functionality
+    function initLightbox() {
+        const lightbox = document.getElementById("image-lightbox");
+        const lightboxImage = lightbox?.querySelector(
+            ".lightbox-image",
+        ) as HTMLImageElement;
+        const closeButton = lightbox?.querySelector(".lightbox-close");
+
+        if (!lightbox || !lightboxImage) return;
+
+        // Function to open lightbox
+        function openLightbox(imageSrc: string, imageAlt: string) {
+            lightboxImage.src = imageSrc;
+            lightboxImage.alt = imageAlt;
+            lightbox.classList.add("active");
+            document.body.style.overflow = "hidden"; // Prevent scrolling
+        }
+
+        // Function to close lightbox
+        function closeLightbox() {
+            lightbox.classList.remove("active");
+            document.body.style.overflow = ""; // Restore scrolling
+            // Clear image after animation
+            setTimeout(() => {
+                if (!lightbox.classList.contains("active")) {
+                    lightboxImage.src = "";
+                }
+            }, 300);
+        }
+
+        // Add click listeners to all images in blog content
+        const contentImages = document.querySelectorAll("article .content img");
+        contentImages.forEach((img) => {
+            img.addEventListener("click", () => {
+                const src = img.getAttribute("src");
+                const alt = img.getAttribute("alt") || "";
+                if (src) {
+                    openLightbox(src, alt);
+                }
+            });
+        });
+
+        // Close on overlay click (but not on image click)
+        lightbox.addEventListener("click", (e) => {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        // Close on close button click
+        closeButton?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            closeLightbox();
+        });
+
+        // Close on ESC key
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && lightbox.classList.contains("active")) {
+                closeLightbox();
+            }
+        });
+    }
+
+    // Initialize on page load
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initLightbox);
+    } else {
+        initLightbox();
+    }
+
+    // Re-initialize after view transitions (for Astro's client-side navigation)
+    document.addEventListener("astro:after-swap", initLightbox);
+</script>

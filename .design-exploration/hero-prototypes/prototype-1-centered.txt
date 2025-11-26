@@ -1,0 +1,87 @@
+PROTOTYPE 1: CENTERED HERO WITH NEURAL NETWORK VISUAL
+════════════════════════════════════════════════════════════════════════════════
+
+DESKTOP LAYOUT (~1200px):
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│                    ○────────○                                                │
+│                   ╱│╲      ╱│╲                                               │
+│                  ○ │ ○────○ │ ○        Upgrade your brain, mind, and body   │
+│                   ╲│╱      ╲│╱                                               │
+│                    ○────────○                                                │
+│                                                                              │
+│                          NEUROHACKINGLY                                      │
+│                                                                              │
+│              Practical strategies for productivity, AI,                      │
+│                      and personal growth                                     │
+│                                                                              │
+│                    ┌─────────────────────────┐                              │
+│                    │  your@email.com    →    │                              │
+│                    └─────────────────────────┘                              │
+│                                                                              │
+│                    [    Read Latest Posts    ]                              │
+│                                                                              │
+│                                                                              │
+│                          ┌─────────┐                                        │
+│                          │  Photo  │                                        │
+│                          │  Lukas  │                                        │
+│                          └─────────┘                                        │
+│                         Lukas Zangerl                                       │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+MOBILE LAYOUT (~375px):
+┌──────────────────────┐
+│                      │
+│    ○───○             │
+│   ╱│╲ ╱│╲            │
+│  ○ │ ○ │ ○           │
+│   ╲│╱ ╲│╱            │
+│    ○───○             │
+│                      │
+│ Upgrade your brain,  │
+│  mind, and body      │
+│                      │
+│  NEUROHACKINGLY      │
+│                      │
+│ Practical strategies │
+│ for productivity,    │
+│ AI, and personal     │
+│ growth               │
+│                      │
+│┌────────────────────┐│
+││ your@email.com  →  ││
+│└────────────────────┘│
+│                      │
+│    ┌─────────┐       │
+│    │  Photo  │       │
+│    │  Lukas  │       │
+│    └─────────┘       │
+│   Lukas Zangerl      │
+│                      │
+└──────────────────────┘
+
+DESIGN RATIONALE:
+Symmetrical, trust-building layout that puts content front and center. The neural
+network visualization above the brand name creates immediate visual association
+with brain optimization. Photo placement at bottom establishes authority after
+the message is delivered.
+
+KEY CSS CONCEPTS:
+- Flexbox with column direction, align-items: center
+- SVG or CSS-drawn neural network animation (subtle pulse/connection lines)
+- max-width: 600px container for text content
+- Vertical rhythm with consistent spacing (margin-bottom: 2rem pattern)
+- Photo as secondary element (smaller, 120px circle)
+
+PROS:
+✓ Maximum readability and focus
+✓ Works perfectly on mobile (already vertical)
+✓ Clear hierarchy: visual → brand → value prop → action
+✓ Professional, trustworthy aesthetic
+
+CONS:
+✗ Less dynamic/engaging than asymmetric layouts
+✗ Neural network graphic needs to be subtle to avoid cheese factor
+✗ Doesn't leverage horizontal space on wide screens
+✗ Photo feels like an afterthought

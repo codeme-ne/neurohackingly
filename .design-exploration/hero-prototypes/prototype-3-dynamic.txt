@@ -1,0 +1,85 @@
+PROTOTYPE 3: DYNAMIC DIAGONAL SPLIT
+════════════════════════════════════════════════════════════════════════════════
+
+DESKTOP LAYOUT (~1200px):
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                    ╱                          │
+│  NEUROHACKINGLY                                  ╱                            │
+│                                                ╱    ┌──────────────┐          │
+│  Upgrade your brain, mind, and body          ╱      │              │          │
+│                                            ╱        │    PHOTO     │          │
+│  You're here because you want to         ╱          │    LUKAS     │          │
+│  think faster, work smarter, and       ╱            │   ZANGERL    │          │
+│  optimize every system in your life. ╱              │              │          │
+│                                    ╱                │  Circular    │          │
+│  Join 10,000+ readers getting   ╱                   │  headshot    │          │
+│  weekly strategies.           ╱                     │              │          │
+│                             ╱                       └──────────────┘          │
+│  ┌──────────────────────┐╱                                                   │
+│  │  Email Address   [→]│                          AI • Neuroscience           │
+│  └──────────────────────┘                          Productivity • Growth      │
+│                       ╱                                                        │
+│  [Read Latest]      ╱                              ┌───────┐  ┌───────┐       │
+│  [Newsletter]     ╱                                │  100+ │  │ 10K+  │       │
+│                 ╱                                  │ Posts │  │Readers│       │
+│               ╱                                    └───────┘  └───────┘       │
+│                                                                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+MOBILE LAYOUT (~375px):
+┌──────────────────────┐
+│  NEUROHACKINGLY      │
+│            ╲         │
+│  Upgrade    ╲        │
+│  your brain, ╲       │
+│  mind, body   ╲      │
+│                ╲     │
+│  You're here    ╲    │
+│  because you     ╲   │
+│  want to think    ╲  │
+│  faster, work      ╲ │
+│  smarter, optimize  ╲│
+│  every system.      ││
+│                     ││
+│  ┌──────────┐       ││
+│  │  PHOTO   │       ││
+│  │  LUKAS   │       ││
+│  └──────────┘       ││
+│                     ││
+│┌──────────────────┐ ││
+││ Email        [→] │ ││
+│└──────────────────┘ ││
+│                     ││
+│ AI • Neuroscience   ││
+│ Productivity        ││
+│                     ││
+│ ┌──────┐ ┌──────┐  ││
+│ │ 100+ │ │ 10K+ │  ││
+│ │Posts │ │Reads │  ││
+│ └──────┘ └──────┘  ││
+│                     ││
+└──────────────────────┘
+
+DESIGN RATIONALE:
+Diagonal split creates visual tension and energy, breaking the typical grid.
+Content-heavy left side with conversational copy, visual elements on right.
+Stats/social proof integrated naturally. This layout says "different thinking."
+
+KEY CSS CONCEPTS:
+- CSS `clip-path: polygon()` for diagonal split background
+- Two-column grid with overlapping diagonal visual element
+- Photo positioned with transform/translate for dynamic feel
+- Animated gradient background on one side (subtle neural blue sweep)
+- Stats cards with hover effects
+
+PROS:
+✓ Visually distinctive and memorable
+✓ Energy and movement without being chaotic
+✓ More conversational, personable copy space
+✓ Social proof integrated organically
+
+CONS:
+✗ Diagonal elements can feel trendy/dated quickly
+✗ Complex responsive behavior (diagonal must adjust gracefully)
+✗ Accessibility: ensure sufficient color contrast across split
+✗ May be too dynamic for some professional contexts

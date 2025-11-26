@@ -1,9 +1,8 @@
 ---
-// Minimal navigation component for Cold Takes design
+// Minimal navigation component
 import Search from "./Search.astro";
 
 const currentPath = Astro.url.pathname;
-const isHome = currentPath === "/" || currentPath === "";
 const isNow = currentPath.startsWith("/now");
 ---
 
@@ -12,13 +11,6 @@ const isNow = currentPath.startsWith("/now");
     <a href="/" class="logo">Neurohackingly</a>
     <div class="nav-right">
       <div class="nav-links">
-        <a
-          href="/"
-          class={`nav-link ${isHome ? "active" : ""}`}
-          aria-current={isHome ? "page" : undefined}
-        >
-          Home
-        </a>
         <a
           href="/now"
           class={`nav-link ${isNow ? "active" : ""}`}
