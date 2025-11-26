@@ -20,7 +20,8 @@
     "fix:internal-links": "tsx scripts/update-internal-links.ts",
     "audit:tags": "tsx scripts/update-tags.ts --dry-run",
     "fix:tags": "tsx scripts/update-tags.ts --write",
-    "validate:tags": "tsx scripts/validate-tags.ts"
+    "validate:tags": "tsx scripts/validate-tags.ts",
+    "new-post": "tsx scripts/new-post.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.10",
