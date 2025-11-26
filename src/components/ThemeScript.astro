@@ -37,6 +37,11 @@
             Math.max(y, window.innerHeight - y),
         );
 
+        const isDark = next === 'dark';
+
+        // Set transition direction class BEFORE starting transition
+        document.documentElement.classList.add(isDark ? 'transitioning-to-dark' : 'transitioning-to-light');
+
         // Start the transition
         const transition = document.startViewTransition(() => {
             document.documentElement.setAttribute("data-theme", next);
@@ -47,8 +52,6 @@
         // Light mode: expand outward (inside → outside)
         // Dark mode: contract inward (outside → inside)
         transition.ready.then(() => {
-            const isDark = next === 'dark';
-
             const clipPath = isDark
                 ? [`circle(${endRadius}px at ${x}px ${y}px)`, `circle(0px at ${x}px ${y}px)`]
                 : [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`];
@@ -64,5 +67,35 @@
                 },
             );
         });
+
+        // Clean up transition class when done
+        transition.finished.then(() => {
+            document.documentElement.classList.remove('transitioning-to-dark', 'transitioning-to-light');
+        });
     };
 </script>
+
+<style is:global>
+    /* Disable default view transition animations so we can use custom clip-path */
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation: none;
+        mix-blend-mode: normal;
+    }
+
+    /* To light (expand): new view on top, expands to cover old */
+    :root.transitioning-to-light ::view-transition-new(root) {
+        z-index: 2;
+    }
+    :root.transitioning-to-light ::view-transition-old(root) {
+        z-index: 1;
+    }
+
+    /* To dark (contract): old view on top, contracts to reveal new */
+    :root.transitioning-to-dark ::view-transition-old(root) {
+        z-index: 2;
+    }
+    :root.transitioning-to-dark ::view-transition-new(root) {
+        z-index: 1;
+    }
+</style>
