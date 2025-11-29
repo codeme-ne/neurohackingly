@@ -1,5 +1,5 @@
 /* Font Loading */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 /* Reset & Base */
 * {
@@ -14,28 +14,22 @@ html {
 
 :root {
   /* Neurohackingly Palette - Warm Sand & Neural Blue */
-  --color-bg: #fdfbf7;
-  /* Warm sand/paper tone */
-  --color-bg-light: #f3f0e9;
+  /* Notion Palette - Light Mode */
+  --color-bg: #ffffff;
+  --color-bg-light: #f7f7f5;
   --color-surface: #ffffff;
 
-  --color-text: #1e293b;
-  /* Slate 800 - neutral dark */
-  --color-text-medium: #475569;
-  /* Slate 600 */
-  --color-text-light: #64748b;
-  /* Slate 500 */
+  --color-text: #37352f;
+  --color-text-medium: #787774; /* Gray */
+  --color-text-light: #9b9a97; /* Light Gray */
 
-  --color-accent: #3b82f6;
-  /* Neural Blue (Blue 500) */
-  --color-accent-hover: #2563eb;
-  /* Blue 600 */
-  --color-accent-dark: #1d4ed8;
-  /* Blue 700 */
+  --color-accent: #2383e2; /* Notion Blue */
+  --color-accent-hover: #1d6fbf;
+  --color-accent-dark: #185ea5;
 
-  --color-border: #e2e8f0;
-  --color-border-light: #f1f5f9;
-  --color-overlay: rgba(30, 41, 59, 0.05);
+  --color-border: #e9e9e9;
+  --color-border-light: #f0f0f0;
+  --color-overlay: rgba(55, 53, 47, 0.09);
 
   /* Button colors - theme-aware for proper contrast */
   --color-button-bg: #1e293b;
@@ -49,9 +43,14 @@ html {
   --color-search-selected: var(--color-bg-light);
 
   /* Typography */
-  --font-sans: 'Outfit', system-ui, sans-serif;
-  --font-serif: 'Playfair Display', serif;
-  --font-mono: 'SF Mono', Monaco, monospace;
+  /* Typography */
+  --font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+    "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-serif:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+    "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; /* Unified font stack */
+  --font-mono: "SF Mono", "Menlo", "Monaco", "Courier New", monospace;
 
   /* Type scale */
   --font-size-xs: 0.75rem;
@@ -79,18 +78,18 @@ html {
 
 /* Dark Theme */
 :root[data-theme="dark"] {
-  --color-bg: #020617;
-  --color-bg-light: #111827;
-  --color-surface: #020617;
-  --color-text: #e8eaed;
-  --color-text-medium: #9ca3af;
-  --color-text-light: #6b7280;
-  --color-accent: #3b82f6;
-  --color-accent-hover: #2563eb;
-  --color-accent-dark: #1d4ed8;
-  --color-border: #2d3748;
-  --color-border-light: #1f2937;
-  --color-overlay: rgba(255, 255, 255, 0.1);
+  --color-bg: #191919;
+  --color-bg-light: #2f2f2f; /* Sidebar/Card bg */
+  --color-surface: #191919;
+  --color-text: #d4d4d4;
+  --color-text-medium: #9b9a97;
+  --color-text-light: #6e6d6b;
+  --color-accent: #2383e2;
+  --color-accent-hover: #1d6fbf;
+  --color-accent-dark: #185ea5;
+  --color-border: #373737;
+  --color-border-light: #2f2f2f;
+  --color-overlay: rgba(255, 255, 255, 0.055);
 
   /* Search-specific colors for dark theme */
   --color-search-highlight: #78350f;
@@ -113,20 +112,32 @@ body {
 }
 
 body::before {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: -1;
   background:
-    radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.14), transparent 45%),
-    radial-gradient(circle at 80% -10%, rgba(14, 165, 233, 0.08), transparent 40%);
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(59, 130, 246, 0.14),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 80% -10%,
+      rgba(14, 165, 233, 0.08),
+      transparent 40%
+    );
   opacity: 0.35;
 }
 
 :root[data-theme="dark"] body::before {
   background:
-    radial-gradient(circle at 25% 15%, rgba(59, 130, 246, 0.22), transparent 55%),
+    radial-gradient(
+      circle at 25% 15%,
+      rgba(59, 130, 246, 0.22),
+      transparent 55%
+    ),
     radial-gradient(circle at 80% 5%, rgba(24, 94, 202, 0.15), transparent 45%);
   opacity: 0.55;
 }
@@ -231,7 +242,11 @@ p {
 a {
   color: var(--color-text);
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--color-border) 80%, transparent);
+  text-decoration-color: color-mix(
+    in srgb,
+    var(--color-border) 80%,
+    transparent
+  );
   text-underline-offset: 2px;
   transition:
     color var(--transition-fast),
@@ -239,7 +254,11 @@ a {
 }
 
 a:hover {
-  text-decoration-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  text-decoration-color: color-mix(
+    in srgb,
+    var(--color-accent) 55%,
+    transparent
+  );
 }
 
 a:focus-visible {
@@ -253,16 +272,32 @@ a:focus-visible {
   padding: 5rem 0 4rem;
   border-bottom: 1px solid var(--color-border-light);
   background:
-    radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 85% 30%, rgba(37, 99, 235, 0.05) 0%, transparent 40%),
+    radial-gradient(
+      circle at 15% 50%,
+      rgba(59, 130, 246, 0.05) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 85% 30%,
+      rgba(37, 99, 235, 0.05) 0%,
+      transparent 40%
+    ),
     linear-gradient(to bottom, transparent 0%, var(--color-bg) 100%);
   position: relative;
 }
 
 :root[data-theme="dark"] .hero {
   background:
-    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(37, 99, 235, 0.12) 0%, transparent 40%),
+    radial-gradient(
+      circle at 20% 50%,
+      rgba(59, 130, 246, 0.15) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(37, 99, 235, 0.12) 0%,
+      transparent 40%
+    ),
     linear-gradient(to bottom, transparent 0%, var(--color-bg) 100%);
 }
 
@@ -295,10 +330,14 @@ a:focus-visible {
 }
 
 .hero-image-wrapper::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -12px;
-  background: linear-gradient(135deg, var(--color-accent) 0%, rgba(59, 130, 246, 0.3) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    rgba(59, 130, 246, 0.3) 100%
+  );
   border-radius: 50%;
   opacity: 0.12;
   filter: blur(24px);
@@ -306,7 +345,11 @@ a:focus-visible {
 }
 
 :root[data-theme="dark"] .hero-image-wrapper::before {
-  background: linear-gradient(135deg, var(--color-accent) 0%, rgba(96, 165, 250, 0.4) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    rgba(96, 165, 250, 0.4) 100%
+  );
   opacity: 0.2;
 }
 
@@ -352,7 +395,7 @@ a:focus-visible {
   }
 }
 
-.animate-entry>* {
+.animate-entry > * {
   opacity: 0;
   animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
@@ -381,7 +424,11 @@ a:focus-visible {
   letter-spacing: -0.04em;
   line-height: 1.05;
   color: var(--color-text);
-  background: linear-gradient(135deg, var(--color-text) 30%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-text) 30%,
+    var(--color-accent) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -447,14 +494,18 @@ a:focus-visible {
   font-weight: 500;
   text-decoration: none;
   transition: all var(--transition-base);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border: 1px solid transparent;
 }
 
 .cta:hover {
   background: var(--color-button-hover);
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .cta:active {
@@ -481,16 +532,24 @@ a:focus-visible {
   transition:
     border-color var(--transition-base),
     background var(--transition-base);
-  background: linear-gradient(180deg,
-      color-mix(in srgb, var(--color-bg-light) 65%, transparent),
-      var(--color-surface));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-bg-light) 65%, transparent),
+    var(--color-surface)
+  );
 }
 
 .post-card:hover {
-  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
-  background: linear-gradient(180deg,
-      color-mix(in srgb, var(--color-accent) 6%, transparent),
-      var(--color-surface));
+  border-color: color-mix(
+    in srgb,
+    var(--color-accent) 35%,
+    var(--color-border)
+  );
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-accent) 6%, transparent),
+    var(--color-surface)
+  );
 }
 
 .post-card:focus-within {
@@ -667,7 +726,6 @@ article .content img {
   box-shadow: 0 2px 12px var(--color-overlay);
 }
 
-
 article .content pre {
   background: var(--color-bg-light);
   padding: 1.35rem 1.5rem;
@@ -693,7 +751,9 @@ article .content pre .copy-button {
   color: var(--color-text-light);
   cursor: pointer;
   opacity: 0.6;
-  transition: opacity var(--transition-fast), color var(--transition-fast);
+  transition:
+    opacity var(--transition-fast),
+    color var(--transition-fast);
   z-index: 10;
   display: flex;
   align-items: center;

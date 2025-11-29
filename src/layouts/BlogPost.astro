@@ -285,3 +285,74 @@ const schema = {
     </script>
   </body>
 </html>
+<style>
+  /* Notion-style overrides for BlogPost */
+  article header {
+    text-align: left; /* Notion is left-aligned */
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  article header h1 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    margin: 1.5rem 0 0.5rem;
+    color: var(--color-text);
+  }
+
+  .feature-image {
+    width: 100%;
+    max-height: 30vh; /* Notion covers are often shorter */
+    object-fit: cover;
+    border-radius: 0; /* Notion covers are full width usually, but here we keep it contained but simpler */
+    margin-bottom: 2rem;
+    box-shadow: none;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-text-medium);
+    margin-top: 0.5rem;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .tags {
+    justify-content: flex-start;
+    margin-top: 1rem;
+  }
+
+  .tag {
+    background: var(--color-bg-light);
+    color: var(--color-text-medium);
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 0.8rem;
+  }
+
+  article .content {
+    max-width: 720px; /* Standard Notion width */
+    margin: 0 auto;
+    font-family: var(--font-sans); /* Ensure body is sans */
+    font-size: 1rem; /* 16px */
+    line-height: 1.5; /* Notion standard */
+    color: var(--color-text);
+  }
+
+  article .content h1,
+  article .content h2,
+  article .content h3 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-top: 2rem;
+  }
+</style>

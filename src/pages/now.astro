@@ -1,14 +1,30 @@
 ---
-import { getEntry } from 'astro:content';
-import BlogPost from '../layouts/BlogPost.astro';
+import { getEntry, getCollection } from "astro:content";
+import BlogPost from "../layouts/BlogPost.astro";
 
-const entry = await getEntry('blog', 'now');
-if (!entry) {
-  throw new Error('Entry "now" not found');
+const entry = await getEntry("blog", "now");
+let Content, headings;
+if (entry) {
+  const rendered = await entry.render();
+  Content = rendered.Content;
+  headings = rendered.headings;
 }
-const { Content, headings } = await entry.render();
 ---
 
-<BlogPost {...entry.data} headings={headings}>
-  <Content />
-</BlogPost>
+{
+  entry && Content ? (
+    <BlogPost
+      {...entry.data}
+      headings={headings}
+      allPosts={await getCollection("blog", ({ data }) => !data.draft)}
+      slug={entry.slug}
+    >
+      <Content />
+    </BlogPost>
+  ) : (
+    <div>
+      <h1>Debug: Entry not found</h1>
+      <p>Could not find blog entry with slug "now"</p>
+    </div>
+  )
+}

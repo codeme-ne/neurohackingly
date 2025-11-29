@@ -1,14 +1,15 @@
 ---
-import { getEntry } from 'astro:content';
-import BlogPost from '../../layouts/BlogPost.astro';
+import { getEntry, getCollection } from "astro:content";
+import BlogPost from "../../layouts/BlogPost.astro";
 
-const entry = await getEntry('blog', 'impossiblelist');
+const entry = await getEntry("blog", "impossiblelist");
 if (!entry) {
   throw new Error('Entry "impossiblelist" not found');
 }
 const { Content } = await entry.render();
+const allPosts = await getCollection("blog", ({ data }) => !data.draft);
 ---
 
-<BlogPost {...entry.data}>
+<BlogPost {...entry.data} allPosts={allPosts} slug={entry.slug}>
   <Content />
 </BlogPost>
